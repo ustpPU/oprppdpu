@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    @page { size: A4; margin: 12mm; }
+    body { font-family: Arial, sans-serif; color: #0f172a; margin: 0; }
+    .header { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); color: #fff; padding: 15px; border-radius: 6px; margin-bottom: 15px; }
+    .title { font-size: 16px; font-weight: bold; text-transform: uppercase; margin-bottom: 8px; }
+    .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 3px 8px; border-radius: 12px; font-size: 9.5px; margin-right: 4px; }
+    .card { background: #f8fafc; border-left: 4px solid #2563eb; padding: 10px 12px; border-radius: 0 6px 6px 0; margin-bottom: 10px; }
+    .card-title { font-size: 10.5px; font-weight: bold; color: #1e3a8a; margin-bottom: 4px; }
+    .card-body { font-size: 10px; line-height: 1.4; color: #334155; }
+    .page-break { page-break-before: always; }
+    
+    .grid { width: 100%; border-collapse: separate; border-spacing: 10px; }
+    .img-box { position: relative; width: 100%; height: 220px; border-radius: 6px; overflow: hidden; background: #e2e8f0; }
+    .img-box img { width: 100%; height: 100%; object-fit: cover; }
+    .overlay { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(15, 23, 42, 0.85); color: #fff; padding: 6px 8px; font-size: 9px; }
+    .footer { margin-top: 15px; padding: 8px; background: #f1f5f9; font-size: 9.5px; text-align: right; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <!-- PAGE 1 -->
+  <div class="header">
+    <div class="title"><?= tajuk ?></div>
+    <div>
+      <span class="badge">📅 <?= tarikh ?></span>
+      <span class="badge">⏰ <?= masa ?></span>
+      <span class="badge">🎯 <?= sasaran ?></span>
+      <span class="badge">👥 <?= pelibatan ?></span>
+    </div>
+  </div>
+
+  <div class="card"><div class="card-title">🎯 OBJEKTIF PROGRAM</div><div class="card-body"><?= objektif ?></div></div>
+  <div class="card" style="border-left-color: #10b981;"><div class="card-title" style="color: #065f46;">💪 KEKUATAN</div><div class="card-body"><?= kekuatan ?></div></div>
+  <div class="card" style="border-left-color: #f59e0b;"><div class="card-title" style="color: #92400e;">📈 PENAMBAHBAIKAN</div><div class="card-body"><?= penambahbaikan ?></div></div>
+
+  <!-- PAGE 2 -->
+  <div class="page-break"></div>
+  <div style="font-size: 12px; font-weight: bold; margin-bottom: 10px;">LAMPIRAN BERGAMBAR PROGRAM</div>
+  <table class="grid">
+    <tr>
+      <td width="50%"><div class="img-box"><img src="<?= img1 ?>"><div class="overlay"><?= cap1 ?></div></div></td>
+      <td width="50%"><div class="img-box"><img src="<?= img2 ?>"><div class="overlay"><?= cap2 ?></div></div></td>
+    </tr>
+    <tr>
+      <td width="50%"><div class="img-box"><img src="<?= img3 ?>"><div class="overlay"><?= cap3 ?></div></div></td>
+      <td width="50%"><div class="img-box"><img src="<?= img4 ?>"><div class="overlay"><?= cap4 ?></div></div></td>
+    </tr>
+  </table>
+
+  <div class="footer">
+    <strong>Disediakan Oleh:</strong> <?= pelapor ?> (<?= jawatan ?>) | <strong>Tarikh Laporan:</strong> <?= tarikhLaporan ?>
+  </div>
+</body>
+</html>
