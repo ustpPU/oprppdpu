@@ -1,146 +1,667 @@
 <!DOCTYPE html>
-<html>
+<html lang="ms" class="h-full bg-slate-50">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Borang OPR SPB</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <title>OPR Web App Dashboard - Laporan Ringkas Program</title>
+  <!-- Tailwind CSS & FontAwesome Icons -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
   <style>
-    body { background-color: #f1f5f9; padding: 20px; font-family: Arial, sans-serif; }
-    .card-box { background: white; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-    .sec-head { font-weight: bold; color: #1e3a8a; border-bottom: 2px solid #2563eb; padding-bottom: 5px; margin-bottom: 15px; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .glass-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); border: 1px solid rgba(226, 232, 240, 0.8); }
+    .gradient-header { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #2563eb 100%); }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
   </style>
 </head>
-<body>
-  <div class="container" style="max-width: 750px;">
-    <div class="card-box text-center bg-primary text-white">
-      <h3>BORANG OPR SPB DINAMIK</h3>
+<body class="h-full flex flex-col text-slate-800">
+
+  <!-- TOP APP BAR -->
+  <header class="gradient-header text-white shadow-xl sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        <div class="flex items-center space-x-3">
+          <div class="w-12 h-12 rounded-xl bg-white/10 backdrop-blur border border-white/20 flex items-center justify-center text-amber-400 text-2xl font-black shadow-inner">
+            <i class="fa-solid fa-file-invoice"></i>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold tracking-tight">OPR Web App Dashboard</h1>
+            <p class="text-xs text-blue-200">Sistem Pelaporan One Page Report Interaktif</p>
+          </div>
+        </div>
+
+        <!-- NAVIGATION TABS -->
+        <nav class="flex space-x-2 bg-white/10 p-1.5 rounded-xl border border-white/10 backdrop-blur">
+          <button onclick="switchTab('dashboard')" id="tab-dashboard" class="px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 bg-white text-blue-900 shadow">
+            <i class="fa-solid fa-chart-pie mr-2"></i>Dashboard & Table
+          </button>
+          <button onclick="switchTab('form')" id="tab-form" class="px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 text-white hover:bg-white/10">
+            <i class="fa-solid fa-circle-plus mr-2"></i>Hantar OPR Baru
+          </button>
+          <button onclick="switchTab('pegawai')" id="tab-pegawai" class="px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 text-white hover:bg-white/10">
+            <i class="fa-solid fa-users-gear mr-2"></i>Sejarah Pegawai
+          </button>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 custom-scrollbar">
+
+    <!-- API SCRIPT URL CONFIG WARNING -->
+    <div id="configAlert" class="hidden mb-6 p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <i class="fa-solid fa-triangle-exclamation text-amber-600 text-xl"></i>
+        <div>
+          <span class="font-bold">Sila Set Web App URL:</span> Masukkan URL Google Apps Script Web App anda dalam JavaScript frontend.
+        </div>
+      </div>
     </div>
 
-    <form id="oprForm">
-      <div class="card-box">
-        <div class="sec-head">1. MAKLUMAT PEGAWAI</div>
-        <div class="mb-3">
-          <label>Pilih Pegawai (Auto-Fill):</label>
-          <select class="form-select" id="pegawaiSelect" onchange="autoFill()"><option value="">-- Pegawai Baharu --</option></select>
+    <!-- ==================== TAB 1: DASHBOARD & LIVE TABLE ==================== -->
+    <section id="sec-dashboard" class="space-y-6">
+      
+      <!-- STATS CARDS -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
+        <div class="glass-card p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between">
+          <div>
+            <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Jumlah OPR Dihantar</p>
+            <h3 id="statTotalOpr" class="text-3xl font-extrabold text-slate-900 mt-1">0</h3>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-between justify-center text-blue-600 text-xl">
+            <i class="fa-solid fa-file-lines"></i>
+          </div>
         </div>
-        <div class="row g-2">
-          <div class="col-md-6"><input type="text" class="form-control" id="pelapor" placeholder="Nama Pegawai" required></div>
-          <div class="col-md-6"><input type="text" class="form-control" id="jawatan" placeholder="Jawatan" required></div>
-          <div class="col-md-4 mt-2"><input type="text" class="form-control" id="noKP" placeholder="No K/P"></div>
-          <div class="col-md-4 mt-2"><input type="text" class="form-control" id="noTel" placeholder="No Tel"></div>
-          <div class="col-md-4 mt-2"><input type="email" class="form-control" id="email" placeholder="Email"></div>
+
+        <div class="glass-card p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between">
+          <div>
+            <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Pegawai Aktif</p>
+            <h3 id="statTotalPegawai" class="text-3xl font-extrabold text-slate-900 mt-1">0</h3>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 text-xl">
+            <i class="fa-solid fa-user-check"></i>
+          </div>
+        </div>
+
+        <div class="glass-card p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between">
+          <div>
+            <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Laporan Bulan Ini</p>
+            <h3 id="statMonthOpr" class="text-3xl font-extrabold text-slate-900 mt-1">0</h3>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 text-xl">
+            <i class="fa-solid fa-calendar-check"></i>
+          </div>
+        </div>
+
+        <div class="glass-card p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between">
+          <div>
+            <p class="text-xs font-bold uppercase tracking-wider text-slate-400">PDF Dalam Drive</p>
+            <h3 id="statDrivePdf" class="text-3xl font-extrabold text-slate-900 mt-1">0</h3>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600 text-xl">
+            <i class="fa-brands fa-google-drive"></i>
+          </div>
         </div>
       </div>
 
-      <div class="card-box">
-        <div class="sec-head">2. BUTIRAN PROGRAM</div>
-        <input type="text" class="form-control mb-2" id="tajuk" placeholder="Tajuk Program" required>
-        <div class="row g-2 mb-2">
-          <div class="col-md-3"><input type="date" class="form-control" id="tarikh" required></div>
-          <div class="col-md-3"><input type="text" class="form-control" id="masa" placeholder="Masa" required></div>
-          <div class="col-md-3"><input type="text" class="form-control" id="sasaran" placeholder="Sasaran" required></div>
-          <div class="col-md-3"><input type="text" class="form-control" id="pelibatan" placeholder="Pelibatan" required></div>
-        </div>
-        <textarea class="form-control mb-2" id="objektif" rows="2" placeholder="Objektif Program" required></textarea>
-        <textarea class="form-control mb-2" id="kekuatan" rows="2" placeholder="Kekuatan Program" required></textarea>
-        <textarea class="form-control mb-2" id="penambahbaikan" rows="2" placeholder="Penambahbaikan" required></textarea>
-      </div>
+      <!-- FILTER & TABLE HEADER -->
+      <div class="glass-card rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
+        <div class="p-5 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-50/50">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900">Senarai Laporan OPR Terkini</h2>
+            <p class="text-xs text-slate-500">Jadual ini dikemaskini secara langsung (Dynamic Live Refresh)</p>
+          </div>
 
-      <div class="card-box">
-        <div class="sec-head">3. LAMPIRAN BERGAMBAR</div>
-        <div class="row g-2">
-          <script>
-            for(let i=1; i<=4; i++){
-              document.write(`
-                <div class="col-md-6 mb-2">
-                  <label>Gambar ${i}</label>
-                  <input type="file" class="form-control mb-1" accept="image/*" onchange="encodeImg(this, ${i})" required>
-                  <input type="text" class="form-control" id="cap${i}" placeholder="Kapsyen Overlay Gambar ${i}" required>
-                  <input type="hidden" id="img${i}">
+          <div class="flex items-center space-x-3">
+            <!-- SEARCH BAR -->
+            <div class="relative">
+              <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+              <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Cari program atau pegawai..." class="pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 outline-none w-64 shadow-sm">
+            </div>
+
+            <!-- REFRESH BUTTON -->
+            <button onclick="loadData(true)" class="px-3 py-2 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 text-xs font-semibold flex items-center space-x-1.5 shadow-sm transition">
+              <i id="refreshSpinner" class="fa-solid fa-rotate"></i>
+              <span>Refresh</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- DYNAMIC LIVE TABLE -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-100/70 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                <th class="py-3.5 px-4">Tarikh & Masa</th>
+                <th class="py-3.5 px-4">Tajuk Program</th>
+                <th class="py-3.5 px-4">Tarikh Pelaksanaan</th>
+                <th class="py-3.5 px-4">Pegawai Pelapor</th>
+                <th class="py-3.5 px-4 text-center">Status PDF</th>
+                <th class="py-3.5 px-4 text-center">Tindakan</th>
+              </tr>
+            </thead>
+            <tbody id="oprTableBody" class="divide-y divide-slate-100 text-xs">
+              <!-- JS Dynamic Rows -->
+              <tr>
+                <td colspan="6" class="py-12 text-center text-slate-400">
+                  <i class="fa-solid fa-spinner fa-spin text-2xl text-blue-600 mb-2"></i>
+                  <p>Memuatkan data laporan terkini...</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 2: SMART OPR FORM ==================== -->
+    <section id="sec-form" class="hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- FORM SECTION (LEFT 7 COLS) -->
+        <div class="lg:col-span-7 glass-card p-6 rounded-2xl shadow-sm border border-slate-200/80 space-y-6">
+          <div class="border-b border-slate-100 pb-4">
+            <h2 class="text-xl font-bold text-slate-900">Borang Laporan OPR Baru</h2>
+            <p class="text-xs text-slate-500">Sila isi borang di bawah. PDF laporan akan dijana secara automatik.</p>
+          </div>
+
+          <form id="oprForm" onsubmit="submitForm(event)" class="space-y-5">
+            
+            <!-- MAKLUMAT PEGAWAI -->
+            <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100/80 space-y-4">
+              <h3 class="text-xs font-extrabold uppercase tracking-wider text-blue-900 flex items-center space-x-2">
+                <i class="fa-solid fa-user-tie"></i> <span>Maklumat Pegawai Pelapor</span>
+              </h3>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Pegawai *</label>
+                  <select id="namaPegawai" onchange="autoFillJawatan()" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+                    <option value="">-- Pilih Pegawai --</option>
+                  </select>
                 </div>
-              `);
-            }
-          </script>
+
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1">Jawatan Pegawai *</label>
+                  <input type="text" id="jawatanPegawai" required placeholder="Jawatan automatik" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Tarikh Laporan Disediakan *</label>
+                <input type="text" id="tarikhLaporan" required placeholder="Cth: 10 Ogos 2026" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+              </div>
+            </div>
+
+            <!-- BUTIRAN PROGRAM -->
+            <div class="space-y-4">
+              <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 flex items-center space-x-2">
+                <i class="fa-solid fa-calendar-day"></i> <span>Butiran Program / Aktiviti</span>
+              </h3>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Tajuk Program / Aktiviti *</label>
+                <input type="text" id="tajukProgram" oninput="updatePreview()" required placeholder="Cth: Bengkel Pemantapan Pengurusan Sekolah" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1">Tarikh Pelaksanaan *</label>
+                  <input type="text" id="tarikhPelaksanaan" oninput="updatePreview()" required placeholder="Cth: 10 Ogos 2026" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1">Masa Pelaksanaan *</label>
+                  <input type="text" id="masa" oninput="updatePreview()" required placeholder="Cth: 8.00 pagi - 5.00 petang" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1">Kumpulan Sasaran *</label>
+                  <input type="text" id="sasaran" oninput="updatePreview()" required placeholder="Cth: 50 orang Guru Penolong Kanan" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1">Pelibatan Pihak Luar/Pegawai *</label>
+                  <input type="text" id="pelibatan" oninput="updatePreview()" required placeholder="Cth: Pegawai PPD, Pengetua, NGO" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+              </div>
+            </div>
+
+            <!-- OBJEKTIF, KEKUATAN & PENAMBAHBAIKAN -->
+            <div class="space-y-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">🎯 Objektif Program (2-3 Poin) *</label>
+                <textarea id="objektif" oninput="updatePreview()" rows="3" required placeholder="1. Meningkatkan kemahiran...&#10;2. Memantapkan pengurusan..." class="w-full bg-white border border-slate-200 rounded-xl p-3 text-xs focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">💪 Kekuatan Program *</label>
+                <textarea id="kekuatan" oninput="updatePreview()" rows="3" required placeholder="● Pengurusan masa yang sangat baik&#10;● Penglibatan aktif peserta" class="w-full bg-white border border-slate-200 rounded-xl p-3 text-xs focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">📈 Penambahbaikan & Cadangan *</label>
+                <textarea id="penambahbaikan" oninput="updatePreview()" rows="3" required placeholder="● Masa sesi Q&A perlu dipanjangkan&#10;● Bahan edaran disediakan awal" class="w-full bg-white border border-slate-200 rounded-xl p-3 text-xs focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+              </div>
+            </div>
+
+            <!-- MUAT NAIK 4 GAMBAR -->
+            <div class="space-y-3">
+              <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 flex items-center space-x-2">
+                <i class="fa-solid fa-images"></i> <span>Lampiran Bergambar (4 Keping Gambar)</span>
+              </h3>
+
+              <div class="grid grid-cols-2 gap-3">
+                <!-- Image 1 -->
+                <div class="p-3 border border-slate-200 rounded-xl bg-slate-50/50 space-y-2">
+                  <p class="text-[11px] font-bold text-slate-700">Gambar 1</p>
+                  <input type="file" accept="image/*" onchange="handleImageUpload(event, 1)" class="text-[11px] text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-[11px] file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200">
+                  <input type="text" id="kapsyen1" oninput="updatePreview()" placeholder="Kapsyen Gambar 1" class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-[11px] outline-none">
+                </div>
+
+                <!-- Image 2 -->
+                <div class="p-3 border border-slate-200 rounded-xl bg-slate-50/50 space-y-2">
+                  <p class="text-[11px] font-bold text-slate-700">Gambar 2</p>
+                  <input type="file" accept="image/*" onchange="handleImageUpload(event, 2)" class="text-[11px] text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-[11px] file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200">
+                  <input type="text" id="kapsyen2" oninput="updatePreview()" placeholder="Kapsyen Gambar 2" class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-[11px] outline-none">
+                </div>
+
+                <!-- Image 3 -->
+                <div class="p-3 border border-slate-200 rounded-xl bg-slate-50/50 space-y-2">
+                  <p class="text-[11px] font-bold text-slate-700">Gambar 3</p>
+                  <input type="file" accept="image/*" onchange="handleImageUpload(event, 3)" class="text-[11px] text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-[11px] file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200">
+                  <input type="text" id="kapsyen3" oninput="updatePreview()" placeholder="Kapsyen Gambar 3" class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-[11px] outline-none">
+                </div>
+
+                <!-- Image 4 -->
+                <div class="p-3 border border-slate-200 rounded-xl bg-slate-50/50 space-y-2">
+                  <p class="text-[11px] font-bold text-slate-700">Gambar 4</p>
+                  <input type="file" accept="image/*" onchange="handleImageUpload(event, 4)" class="text-[11px] text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-[11px] file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200">
+                  <input type="text" id="kapsyen4" oninput="updatePreview()" placeholder="Kapsyen Gambar 4" class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-[11px] outline-none">
+                </div>
+              </div>
+            </div>
+
+            <!-- SUBMIT BUTTON -->
+            <button type="submit" id="submitBtn" class="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-600/30 transition flex items-center justify-center space-x-2 text-sm">
+              <i class="fa-solid fa-paper-plane"></i>
+              <span>Hantar & Jana PDF dalam Drive</span>
+            </button>
+          </form>
         </div>
-        <div class="mt-2">
-          <label>Tarikh Laporan Disediakan:</label>
-          <input type="date" class="form-control" id="tarikhLaporan" required>
+
+        <!-- LIVE PREVIEW SECTION (RIGHT 5 COLS) -->
+        <div class="lg:col-span-5 space-y-4">
+          <div class="sticky top-28 space-y-4">
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider flex items-center space-x-2">
+                <i class="fa-solid fa-eye text-blue-600"></i> <span>Live Interactive OPR Preview</span>
+              </h3>
+              <span class="text-[10px] bg-emerald-100 text-emerald-700 font-bold px-2 py-0.5 rounded-full">Pratonton</span>
+            </div>
+
+            <!-- MINI OPR SHEET DESIGN PREVIEW -->
+            <div class="bg-white border border-slate-300 shadow-xl rounded-xl p-5 text-[10px] text-slate-800 space-y-3 font-sans leading-relaxed">
+              <div class="text-center border-b pb-2 border-slate-200">
+                <h4 class="font-bold text-xs text-blue-900 uppercase tracking-tight">LAPORAN RINGKAS PROGRAM / AKTIVITI (ONE PAGE REPORT)</h4>
+                <p class="text-[8px] text-slate-500 italic">"PENDIDIKAN BERMUTU, INSAN TERDIDIK, NEGARA SEJAHTERA"</p>
+              </div>
+
+              <table class="w-full border-collapse border border-slate-200 text-[9px]">
+                <tr class="border-b"><td class="w-1/3 bg-slate-100 p-1 font-bold">Tajuk Program</td><td id="prevTajuk" class="p-1 font-semibold text-blue-900">[ Tajuk Program ]</td></tr>
+                <tr class="border-b"><td class="bg-slate-100 p-1 font-bold">Tarikh</td><td id="prevTarikh" class="p-1">[ Tarikh Pelaksanaan ]</td></tr>
+                <tr class="border-b"><td class="bg-slate-100 p-1 font-bold">Masa</td><td id="prevMasa" class="p-1">[ Masa ]</td></tr>
+                <tr class="border-b"><td class="bg-slate-100 p-1 font-bold">Sasaran</td><td id="prevSasaran" class="p-1">[ Sasaran ]</td></tr>
+                <tr class="border-b"><td class="bg-slate-100 p-1 font-bold">Pelibatan</td><td id="prevPelibatan" class="p-1">[ Pelibatan ]</td></tr>
+              </table>
+
+              <div class="border rounded p-2 bg-slate-50/50">
+                <p class="font-bold text-blue-800">🎯 OBJEKTIF PROGRAM</p>
+                <p id="prevObjektif" class="whitespace-pre-wrap text-slate-600 mt-0.5">[ Objektif ]</p>
+              </div>
+
+              <div class="border rounded p-2 bg-slate-50/50">
+                <p class="font-bold text-blue-800">💪 KEKUATAN</p>
+                <p id="prevKekuatan" class="whitespace-pre-wrap text-slate-600 mt-0.5">[ Kekuatan ]</p>
+              </div>
+
+              <div class="border rounded p-2 bg-slate-50/50">
+                <p class="font-bold text-blue-800">📈 PENAMBAHBAIKAN</p>
+                <p id="prevPenambahbaikan" class="whitespace-pre-wrap text-slate-600 mt-0.5">[ Penambahbaikan ]</p>
+              </div>
+
+              <div class="border rounded p-2 bg-slate-50/50">
+                <p class="font-bold text-blue-800 mb-1">📸 LAMPIRAN BERGAMBAR</p>
+                <div class="grid grid-cols-2 gap-1.5">
+                  <div class="border rounded p-1 text-center bg-white"><img id="prevImg1" class="h-14 w-full object-cover rounded hidden"><span id="prevCap1" class="text-[8px] text-slate-400 italic block">Gambar 1</span></div>
+                  <div class="border rounded p-1 text-center bg-white"><img id="prevImg2" class="h-14 w-full object-cover rounded hidden"><span id="prevCap2" class="text-[8px] text-slate-400 italic block">Gambar 2</span></div>
+                  <div class="border rounded p-1 text-center bg-white"><img id="prevImg3" class="h-14 w-full object-cover rounded hidden"><span id="prevCap3" class="text-[8px] text-slate-400 italic block">Gambar 3</span></div>
+                  <div class="border rounded p-1 text-center bg-white"><img id="prevImg4" class="h-14 w-full object-cover rounded hidden"><span id="prevCap4" class="text-[8px] text-slate-400 italic block">Gambar 4</span></div>
+                </div>
+              </div>
+
+              <div class="pt-2 text-[9px] border-t border-slate-200">
+                <p><strong>Disediakan oleh:</strong> <span id="prevNama">[ Nama Pegawai ]</span> (<span id="prevJawatan">[ Jawatan ]</span>)</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== TAB 3: SEJARAH PEGAWAI ==================== -->
+    <section id="sec-pegawai" class="hidden space-y-6">
+      <div class="glass-card p-6 rounded-2xl shadow-sm border border-slate-200/80">
+        <h2 class="text-lg font-bold text-slate-900 mb-1">Direktori & Sejarah Laporan Pegawai</h2>
+        <p class="text-xs text-slate-500 mb-6">Klik mana-mana pegawai untuk melihat senarai OPR yang pernah dihantar oleh beliau.</p>
+
+        <div id="pegawaiGrid" class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <!-- JS Dynamic Pegawai Cards -->
         </div>
       </div>
+    </section>
 
-      <button type="submit" class="btn btn-dark w-100 p-2 font-weight-bold" id="btnSubmit">HANTAR & JANA PDF</button>
-    </form>
-    <div id="result" class="mt-3 text-center"></div>
+  </main>
+
+  <!-- MODAL SEJARAH OPR PEGAWAI -->
+  <div id="historyModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-3xl w-full p-6 shadow-2xl border border-slate-100 max-h-[85vh] flex flex-col">
+      <div class="flex justify-between items-center pb-4 border-b border-slate-100">
+        <div>
+          <h3 id="modalPegawaiName" class="text-lg font-bold text-slate-900">Sejarah OPR Pegawai</h3>
+          <p id="modalPegawaiJawatan" class="text-xs text-slate-500">Jawatan</p>
+        </div>
+        <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 text-lg w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div id="modalOprList" class="flex-1 overflow-y-auto py-4 space-y-3 custom-scrollbar">
+        <!-- Dynamic Modal List -->
+      </div>
+    </div>
   </div>
 
+  <!-- JAVASCRIPT LOGIC -->
   <script>
-    // TAMPAL URL WEB APP GAS ANDA DI SINI
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycby791m-vz5x-sNKN0mIKXIvAlKYyqE2CzQ1xvfWBNfIz5gd7qRyxobEVL6f_QU3h6-6HA/exec";
+    // =========================================================================
+    // SCRIPT URL GOOGLE APPS SCRIPT WEB APP ANDA
+    // =========================================================================
+    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx-y1kwthywJhOMyKxi_n8y9yLXQV51z0ASFVdCSHTE2w0_rxdkPfUv-TjK_aw-c3UG/exec";
 
-    let pList = [];
-
-    window.onload = function() {
-      fetch(GAS_API_URL)
-        .then(res => res.json())
-        .then(data => {
-          pList = data;
-          let s = document.getElementById('pegawaiSelect');
-          data.forEach((p, i) => s.innerHTML += `<option value="${i}">${p.nama}</option>`);
-        });
+    let state = {
+      pegawai: [],
+      respon: [],
+      images: { 1: null, 2: null, 3: null, 4: null }
     };
 
-    function autoFill() {
-      let v = document.getElementById('pegawaiSelect').value;
-      if(v !== "") {
-        let p = pList[v];
-        document.getElementById('pelapor').value = p.nama;
-        document.getElementById('jawatan').value = p.jawatan;
-        document.getElementById('noKP').value = p.noKP;
-        document.getElementById('noTel').value = p.noTel;
-        document.getElementById('email').value = p.email;
+    document.addEventListener("DOMContentLoaded", function() {
+      if (!GAS_WEB_APP_URL || GAS_WEB_APP_URL.includes("REPLACE_WITH_YOUR_EXEC_URL")) {
+        document.getElementById("configAlert").classList.remove("hidden");
+      }
+      loadData();
+    });
+
+    // SWITCH TAB
+    function switchTab(tab) {
+      document.getElementById("sec-dashboard").classList.add("hidden");
+      document.getElementById("sec-form").classList.add("hidden");
+      document.getElementById("sec-pegawai").classList.add("hidden");
+
+      document.getElementById("tab-dashboard").className = "px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 text-white hover:bg-white/10";
+      document.getElementById("tab-form").className = "px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 text-white hover:bg-white/10";
+      document.getElementById("tab-pegawai").className = "px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 text-white hover:bg-white/10";
+
+      document.getElementById("sec-" + tab).classList.remove("hidden");
+      const activeBtn = document.getElementById("tab-" + tab);
+      activeBtn.className = "px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 bg-white text-blue-900 shadow";
+    }
+
+    // LOAD DATA DARI GAS
+    async function loadData(isRefresh = false) {
+      const refreshSpinner = document.getElementById("refreshSpinner");
+      if (isRefresh) refreshSpinner.classList.add("fa-spin");
+
+      try {
+        const response = await fetch(`${GAS_WEB_APP_URL}?action=getInitialData`);
+        const result = await response.json();
+
+        if (result.status === "success") {
+          state.pegawai = result.pegawai || [];
+          state.respon = result.respon || [];
+
+          renderStats();
+          renderTable(state.respon);
+          populatePegawaiDropdown();
+          renderPegawaiGrid();
+        }
+      } catch (err) {
+        console.error("Gagal tarik data:", err);
+      } finally {
+        if (isRefresh) refreshSpinner.classList.remove("fa-spin");
       }
     }
 
-    function encodeImg(el, i) {
-      let r = new FileReader();
-      r.onloadend = function() { document.getElementById('img' + i).value = r.result; };
-      r.readAsDataURL(el.files[0]);
+    // RENDER STATS CARDS
+    function renderStats() {
+      document.getElementById("statTotalOpr").innerText = state.respon.length;
+      document.getElementById("statTotalPegawai").innerText = state.pegawai.length;
+      
+      const thisMonth = new Date().getMonth();
+      const countMonth = state.respon.filter(r => r.timestamp && new Date(r.timestamp).getMonth() === thisMonth).length;
+      document.getElementById("statMonthOpr").innerText = countMonth;
+      
+      const pdfCount = state.respon.filter(r => r.pautanPdf && r.pautanPdf !== "#").length;
+      document.getElementById("statDrivePdf").innerText = pdfCount;
     }
 
-    document.getElementById('oprForm').onsubmit = function(e) {
-      e.preventDefault();
-      document.getElementById('btnSubmit').disabled = true;
-      document.getElementById('btnSubmit').innerText = "Sedang Jana PDF...";
+    // RENDER TABLE
+    function renderTable(data) {
+      const tbody = document.getElementById("oprTableBody");
+      if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400">Tiada laporan OPR direkodkan lagi.</td></tr>`;
+        return;
+      }
 
-      let payload = {
-        pelapor: document.getElementById('pelapor').value, jawatan: document.getElementById('jawatan').value,
-        noKP: document.getElementById('noKP').value, noTel: document.getElementById('noTel').value, email: document.getElementById('email').value,
-        tajuk: document.getElementById('tajuk').value, tarikh: document.getElementById('tarikh').value, masa: document.getElementById('masa').value,
-        sasaran: document.getElementById('sasaran').value, pelibatan: document.getElementById('pelibatan').value,
-        objektif: document.getElementById('objektif').value, kekuatan: document.getElementById('kekuatan').value, penambahbaikan: document.getElementById('penambahbaikan').value,
-        tarikhLaporan: document.getElementById('tarikhLaporan').value,
-        img1: document.getElementById('img1').value, cap1: document.getElementById('cap1').value,
-        img2: document.getElementById('img2').value, cap2: document.getElementById('cap2').value,
-        img3: document.getElementById('img3').value, cap3: document.getElementById('cap3').value,
-        img4: document.getElementById('img4').value, cap4: document.getElementById('cap4').value
+      tbody.innerHTML = data.map(r => `
+        <tr class="hover:bg-slate-50/80 transition border-b border-slate-100">
+          <td class="py-3 px-4 font-mono text-[11px] text-slate-500">${r.timestamp || '-'}</td>
+          <td class="py-3 px-4 font-bold text-slate-800">${r.tajukProgram}</td>
+          <td class="py-3 px-4 text-slate-600">${r.tarikhPelaksanaan}</td>
+          <td class="py-3 px-4 font-medium text-slate-700">${r.namaPegawai}</td>
+          <td class="py-3 px-4 text-center">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
+              <i class="fa-solid fa-check-circle mr-1"></i> Drive PDF
+            </span>
+          </td>
+          <td class="py-3 px-4 text-center">
+            <a href="${r.pautanPdf}" target="_blank" class="inline-flex items-center px-3 py-1 bg-blue-50 text-blue-700 hover:bg-blue-600 hover:text-white rounded-lg font-bold text-[11px] transition space-x-1 border border-blue-200">
+              <i class="fa-solid fa-file-pdf"></i>
+              <span>Buka PDF</span>
+            </a>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    // SEARCH FILTER
+    function filterTable() {
+      const q = document.getElementById("searchInput").value.toLowerCase();
+      const filtered = state.respon.filter(r => 
+        r.tajukProgram.toLowerCase().includes(q) || 
+        r.namaPegawai.toLowerCase().includes(q)
+      );
+      renderTable(filtered);
+    }
+
+    // DROPDOWN PEGAWAI
+    function populatePegawaiDropdown() {
+      const select = document.getElementById("namaPegawai");
+      select.innerHTML = '<option value="">-- Pilih Pegawai --</option>' + 
+        state.pegawai.map(p => `<option value="${p.nama}">${p.nama}</option>`).join("");
+    }
+
+    function autoFillJawatan() {
+      const selectedName = document.getElementById("namaPegawai").value;
+      const found = state.pegawai.find(p => p.nama === selectedName);
+      if (found) {
+        document.getElementById("jawatanPegawai").value = found.jawatan;
+      }
+      updatePreview();
+    }
+
+    // IMAGE UPLOAD HANDLER
+    function handleImageUpload(e, index) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          state.images[index] = evt.target.result;
+          const imgEl = document.getElementById(`prevImg${index}`);
+          imgEl.src = evt.target.result;
+          imgEl.classList.remove("hidden");
+          updatePreview();
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    // LIVE PREVIEW UPDATE
+    function updatePreview() {
+      document.getElementById("prevTajuk").innerText = document.getElementById("tajukProgram").value || "[ Tajuk Program ]";
+      document.getElementById("prevTarikh").innerText = document.getElementById("tarikhPelaksanaan").value || "[ Tarikh Pelaksanaan ]";
+      document.getElementById("prevMasa").innerText = document.getElementById("masa").value || "[ Masa ]";
+      document.getElementById("prevSasaran").innerText = document.getElementById("sasaran").value || "[ Sasaran ]";
+      document.getElementById("prevPelibatan").innerText = document.getElementById("pelibatan").value || "[ Pelibatan ]";
+      document.getElementById("prevObjektif").innerText = document.getElementById("objektif").value || "[ Objektif ]";
+      document.getElementById("prevKekuatan").innerText = document.getElementById("kekuatan").value || "[ Kekuatan ]";
+      document.getElementById("prevPenambahbaikan").innerText = document.getElementById("penambahbaikan").value || "[ Penambahbaikan ]";
+      document.getElementById("prevNama").innerText = document.getElementById("namaPegawai").value || "[ Nama Pegawai ]";
+      document.getElementById("prevJawatan").innerText = document.getElementById("jawatanPegawai").value || "[ Jawatan ]";
+
+      for(let i=1; i<=4; i++) {
+        const cap = document.getElementById(`kapsyen${i}`).value;
+        if (cap) document.getElementById(`prevCap${i}`).innerText = cap;
+      }
+    }
+
+    // SUBMIT FORM (POST)
+    async function submitForm(e) {
+      e.preventDefault();
+      const submitBtn = document.getElementById("submitBtn");
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Menjana PDF & Menyimpan ke Drive...</span>`;
+
+      const payload = {
+        namaPegawai: document.getElementById("namaPegawai").value,
+        jawatanPegawai: document.getElementById("jawatanPegawai").value,
+        tarikhLaporan: document.getElementById("tarikhLaporan").value,
+        tajukProgram: document.getElementById("tajukProgram").value,
+        tarikhPelaksanaan: document.getElementById("tarikhPelaksanaan").value,
+        masa: document.getElementById("masa").value,
+        sasaran: document.getElementById("sasaran").value,
+        pelibatan: document.getElementById("pelibatan").value,
+        objektif: document.getElementById("objektif").value,
+        kekuatan: document.getElementById("kekuatan").value,
+        penambahbaikan: document.getElementById("penambahbaikan").value,
+        gambar1: state.images[1] || "",
+        kapsyen1: document.getElementById("kapsyen1").value,
+        gambar2: state.images[2] || "",
+        kapsyen2: document.getElementById("kapsyen2").value,
+        gambar3: state.images[3] || "",
+        kapsyen3: document.getElementById("kapsyen3").value,
+        gambar4: state.images[4] || "",
+        kapsyen4: document.getElementById("kapsyen4").value
       };
 
-      fetch(GAS_API_URL, {
-        method: "POST",
-        body: JSON.stringify(payload)
-      })
-      .then(res => res.json())
-      .then(res => {
-        document.getElementById('btnSubmit').disabled = false;
-        document.getElementById('btnSubmit').innerText = "HANTAR & JANA PDF";
-        if(res.status === "success") {
-          document.getElementById('result').innerHTML = `<div class="alert alert-success">PDF Siap! <br><a href="${res.pdfUrl}" target="_blank" class="btn btn-success btn-sm mt-1">Buka PDF</a></div>`;
+      try {
+        const res = await fetch(GAS_WEB_APP_URL, {
+          method: "POST",
+          body: JSON.stringify(payload)
+        });
+        const result = await res.json();
+
+        if (result.status === "success") {
+          alert(" Berjaya! Laporan OPR telah ditambah dan PDF tersimpan di Drive.");
+          document.getElementById("oprForm").reset();
+          state.images = { 1: null, 2: null, 3: null, 4: null };
+          switchTab('dashboard');
+          await loadData(true); // DYNAMIC AUTO REFRESH DATA TABLE!
         } else {
-          document.getElementById('result').innerHTML = `<div class="alert alert-danger">Ralat: ${res.message}</div>`;
+          alert("Ralat: " + result.message);
         }
-      });
-    };
+      } catch (err) {
+        alert("Ralat sambungan: " + err.toString());
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> <span>Hantar & Jana PDF dalam Drive</span>`;
+      }
+    }
+
+    // PEGAWAI SEJARAH GRID
+    function renderPegawaiGrid() {
+      const grid = document.getElementById("pegawaiGrid");
+      if (state.pegawai.length === 0) {
+        grid.innerHTML = `<p class="col-span-3 text-slate-400 text-xs">Tiada data pegawai dalam tab Details_Pegawai.</p>`;
+        return;
+      }
+
+      grid.innerHTML = state.pegawai.map(p => {
+        const oprs = state.respon.filter(r => r.namaPegawai === p.nama);
+        return `
+          <div onclick="openHistoryModal('${p.nama}')" class="p-5 bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-md transition cursor-pointer flex items-start space-x-4 hover:border-blue-300">
+            <div class="w-12 h-12 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-lg">
+              ${p.nama.charAt(0)}
+            </div>
+            <div class="flex-1 min-w-0">
+              <h4 class="font-bold text-slate-900 text-sm truncate">${p.nama}</h4>
+              <p class="text-xs text-slate-500 truncate">${p.jawatan}</p>
+              <div class="mt-3 flex items-center justify-between text-xs">
+                <span class="font-semibold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg">${oprs.length} OPR Dihantar</span>
+                <span class="text-slate-400 hover:text-slate-600 font-bold">Lihat <i class="fa-solid fa-chevron-right text-[10px]"></i></span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    // MODAL HISTORY PEGAWAI
+    function openHistoryModal(namaPegawai) {
+      const p = state.pegawai.find(x => x.nama === namaPegawai);
+      const oprs = state.respon.filter(r => r.namaPegawai === namaPegawai);
+
+      document.getElementById("modalPegawaiName").innerText = namaPegawai;
+      document.getElementById("modalPegawaiJawatan").innerText = p ? p.jawatan : "";
+
+      const modalList = document.getElementById("modalOprList");
+      if (oprs.length === 0) {
+        modalList.innerHTML = `<p class="text-center text-slate-400 py-8 text-xs">Pegawai ini belum pernah menghantar sebarang OPR.</p>`;
+      } else {
+        modalList.innerHTML = oprs.map(r => `
+          <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/50 flex items-center justify-between">
+            <div>
+              <h5 class="font-bold text-slate-800 text-xs">${r.tajukProgram}</h5>
+              <p class="text-[11px] text-slate-500 mt-0.5"><i class="fa-regular fa-calendar"></i> Tarikh: ${r.tarikhPelaksanaan} | Masa: ${r.masa}</p>
+            </div>
+            <a href="${r.pautanPdf}" target="_blank" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition flex items-center space-x-1 shadow-sm">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i>
+              <span>Buka PDF</span>
+            </a>
+          </div>
+        `).join("");
+      }
+
+      document.getElementById("historyModal").classList.remove("hidden");
+    }
+
+    function closeModal() {
+      document.getElementById("historyModal").classList.add("hidden");
+    }
   </script>
 </body>
 </html>
