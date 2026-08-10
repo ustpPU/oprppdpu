@@ -75,12 +75,11 @@
   </div>
 
   <script>
-    // MASUKKAN URL WEB APP GAS ANDA DI SINI
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwyne_NGwXbI9yhlBdQ9BcB2fh3IgNZvAl-64HbeDSHkArpgw0pqIRMo5N6NYsuB_080g/exec";
+    // TAMPAL URL WEB APP GAS ANDA DI SINI
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycby791m-vz5x-sNKN0mIKXIvAlKYyqE2CzQ1xvfWBNfIz5gd7qRyxobEVL6f_QU3h6-6HA/exec";
 
     let pList = [];
 
-    // Tarik senarai pegawai dari GAS API
     window.onload = function() {
       fetch(GAS_API_URL)
         .then(res => res.json())
