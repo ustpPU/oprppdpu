@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background-color: #f1f5f9; padding: 20px; font-family: Arial, sans-serif; }
+    .card-box { background: white; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+    .sec-head { font-weight: bold; color: #1e3a8a; border-bottom: 2px solid #2563eb; padding-bottom: 5px; margin-bottom: 15px; }
+  </style>
+</head>
+<body>
+  <div class="container" style="max-width: 750px;">
+    <div class="card-box text-center bg-primary text-white">
+      <h3>BORANG OPR SPB DINAMIK</h3>
+    </div>
+
+    <form id="oprForm">
+      <div class="card-box">
+        <div class="sec-head">1. MAKLUMAT PEGAWAI</div>
+        <div class="mb-3">
+          <label>Pilih Pegawai (Pilihan):</label>
+          <select class="form-select" id="pegawaiSelect" onchange="autoFill()"><option value="">-- Pegawai Baharu --</option></select>
+        </div>
+        <div class="row g-2">
+          <div class="col-md-6"><input type="text" class="form-control" id="pelapor" placeholder="Nama Pegawai" required></div>
+          <div class="col-md-6"><input type="text" class="form-control" id="jawatan" placeholder="Jawatan" required></div>
+          <div class="col-md-4 mt-2"><input type="text" class="form-control" id="noKP" placeholder="No K/P"></div>
+          <div class="col-md-4 mt-2"><input type="text" class="form-control" id="noTel" placeholder="No Tel"></div>
+          <div class="col-md-4 mt-2"><input type="email" class="form-control" id="email" placeholder="Email"></div>
+        </div>
+      </div>
+
+      <div class="card-box">
+        <div class="sec-head">2. BUTIRAN PROGRAM</div>
+        <input type="text" class="form-control mb-2" id="tajuk" placeholder="Tajuk Program" required>
+        <div class="row g-2 mb-2">
+          <div class="col-md-3"><input type="date" class="form-control" id="tarikh" required></div>
+          <div class="col-md-3"><input type="text" class="form-control" id="masa" placeholder="Masa" required></div>
+          <div class="col-md-3"><input type="text" class="form-control" id="sasaran" placeholder="Sasaran" required></div>
+          <div class="col-md-3"><input type="text" class="form-control" id="pelibatan" placeholder="Pelibatan" required></div>
+        </div>
+        <textarea class="form-control mb-2" id="objektif" rows="2" placeholder="Objektif Program" required></textarea>
+        <textarea class="form-control mb-2" id="kekuatan" rows="2" placeholder="Kekuatan Program" required></textarea>
+        <textarea class="form-control mb-2" id="penambahbaikan" rows="2" placeholder="Penambahbaikan" required></textarea>
+      </div>
+
+      <div class="card-box">
+        <div class="sec-head">3. LAMPIRAN BERGAMBAR</div>
+        <div class="row g-2">
+          <script>
+            for(let i=1; i<=4; i++){
+              document.write(`
+                <div class="col-md-6 mb-2">
+                  <label>Gambar ${i}</label>
+                  <input type="file" class="form-control mb-1" accept="image/*" onchange="encodeImg(this, ${i})" required>
+                  <input type="text" class="form-control" id="cap${i}" placeholder="Kapsyen Overlay Gambar ${i}" required>
+                  <input type="hidden" id="img${i}">
+                </div>
+              `);
+            }
+          </script>
+        </div>
+        <div class="mt-2">
+          <label>Tarikh Laporan Disediakan:</label>
+          <input type="date" class="form-control" id="tarikhLaporan" required>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-dark w-100 p-2 font-weight-bold" id="btnSubmit">HANTAR & JANA PDF</button>
+    </form>
+    <div id="result" class="mt-3 text-center"></div>
+  </div>
+
+  <script>
+    let pList = [];
+    window.onload = function() { google.script.run.withSuccessHandler(function(d){
+      pList = d;
+      let s = document.getElementById('pegawaiSelect');
+      d.forEach((p,i) => s.innerHTML += `<option value="${i}">${p.nama}</option>`);
+    }).getPegawaiList(); };
+
+    function autoFill() {
+      let v = document.getElementById('pegawaiSelect').value;
+      if(v !== "") {
+        let p = pList[v];
+        document.getElementById('pelapor').value = p.nama;
+        document.getElementById('jawatan').value = p.jawatan;
+        document.getElementById('noKP').value = p.noKP;
+        document.getElementById('noTel').value = p.noTel;
+        document.getElementById('email').value = p.email;
+      }
+    }
+
+    function encodeImg(el, i) {
+      let r = new FileReader();
+      r.onloadend = function() { document.getElementById('img' + i).value = r.result; };
+      r.readAsDataURL(el.files[0]);
+    }
+
+    document.getElementById('oprForm').onsubmit = function(e) {
+      e.preventDefault();
+      document.getElementById('btnSubmit').disabled = true;
+      document.getElementById('btnSubmit').innerText = "Proses Jana PDF...";
+
+      let data = {
+        pelapor: document.getElementById('pelapor').value, jawatan: document.getElementById('jawatan').value,
+        noKP: document.getElementById('noKP').value, noTel: document.getElementById('noTel').value, email: document.getElementById('email').value,
+        tajuk: document.getElementById('tajuk').value, tarikh: document.getElementById('tarikh').value, masa: document.getElementById('masa').value,
+        sasaran: document.getElementById('sasaran').value, pelibatan: document.getElementById('pelibatan').value,
+        objektif: document.getElementById('objektif').value, kekuatan: document.getElementById('kekuatan').value, penambahbaikan: document.getElementById('penambahbaikan').value,
+        tarikhLaporan: document.getElementById('tarikhLaporan').value,
+        img1: document.getElementById('img1').value, cap1: document.getElementById('cap1').value,
+        img2: document.getElementById('img2').value, cap2: document.getElementById('cap2').value,
+        img3: document.getElementById('img3').value, cap3: document.getElementById('cap3').value,
+        img4: document.getElementById('img4').value, cap4: document.getElementById('cap4').value
+      };
+
+      google.script.run.withSuccessHandler(function(res) {
+        document.getElementById('btnSubmit').disabled = false;
+        document.getElementById('btnSubmit').innerText = "HANTAR & JANA PDF";
+        document.getElementById('result').innerHTML = `<div class="alert alert-success">PDF Siap! <br><a href="${res.pdfUrl}" target="_blank" class="btn btn-success btn-sm mt-1">Buka PDF</a></div>`;
+      }).processOPRForm(data);
+    };
+  </script>
+</body>
+</html>
