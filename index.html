@@ -1,821 +1,556 @@
 <!DOCTYPE html>
-<html lang="ms" class="h-full bg-slate-100">
+<html lang="ms">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OPR Web App - PPD Petaling Utama</title>
-  <link rel="icon" type="image/png" href="https://i.ibb.co/ycG5rppn/logo.png">
-  
+  <title>Sistem Laporan OPR</title>
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  
-  <!-- HTML2PDF LIBRARY UNTUK JANA DIRECT BROWSER PDF FAST -->
+  <!-- html2pdf.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
   <style>
-    body { font-family: 'Plus Jakarta Sans', sans-serif; }
-    .glass-card { background: #ffffff; border: 1px solid #e2e8f0; }
-    .gradient-header { background: #0f172a; }
-    
-    /* ANIMASI PULSING GLOW REFRESH */
-    @keyframes pulseGlow {
-      0%, 100% { box-shadow: 0 0 0px rgba(37, 99, 235, 0); transform: scale(1); }
-      50% { box-shadow: 0 0 18px rgba(37, 99, 235, 0.8); transform: scale(1.03); border-color: #2563eb; }
+    .a4-page {
+      width: 210mm;
+      min-height: 297mm;
+      background: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      margin: 0 auto;
     }
-    .pulsing-refresh {
-      animation: pulseGlow 1.2s infinite ease-in-out;
-      background-color: #eff6ff !important;
-      color: #1d4ed8 !important;
-      border-color: #3b82f6 !important;
+    @media print {
+      body { background: white; }
+      .no-print { display: none; }
+      .a4-page { box-shadow: none; margin: 0; }
     }
-
-    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-    .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
   </style>
 </head>
-<body class="h-full flex flex-col text-slate-800">
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col md:flex-row">
 
-  <!-- OVERLAY SKRIN KABUR KETIKA SUBMIT / EDIT (LOCK SCREEN) -->
-  <div id="blurOverlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] hidden flex flex-col items-center justify-center text-white space-y-4">
-    <div class="animate-spin rounded-full h-14 w-14 border-4 border-blue-500 border-t-transparent shadow-lg"></div>
-    <div class="text-center">
-      <h3 id="overlayTitle" class="text-lg font-extrabold tracking-wide">Menjana PDF & Menyimpan Laporan...</h3>
-      <p class="text-xs text-slate-300 mt-1">Skrin dikunci seketika. Sila tunggu sebentar.</p>
+  <!-- SIDEBAR NAVIGATION -->
+  <aside class="w-full md:w-64 bg-slate-900 text-white flex-shrink-0 flex flex-col justify-between p-4 no-print">
+    <div>
+      <div class="flex items-center space-x-3 mb-8 px-2">
+        <i class="fa-solid fa-file-invoice text-indigo-400 text-2xl"></i>
+        <h1 class="text-xl font-bold tracking-wide">Sistem OPR</h1>
+      </div>
+      <nav class="space-y-2">
+        <button onclick="switchTab('dashboard')" id="navDashboard" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition bg-indigo-600 text-white font-medium">
+          <i class="fa-solid fa-chart-line"></i>
+          <span>Dashboard / Senarai</span>
+        </button>
+        <button onclick="switchTab('form')" id="navForm" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition hover:bg-slate-800 text-slate-300 font-medium">
+          <i class="fa-solid fa-pen-to-square"></i>
+          <span>Borang OPR Baru</span>
+        </button>
+      </nav>
     </div>
-  </div>
+    <div class="text-xs text-slate-500 text-center pt-4 border-t border-slate-800">
+      &copy; Sistem OPR Auto PDF
+    </div>
+  </aside>
 
-  <!-- TOP APP BAR -->
-  <header class="gradient-header text-white shadow-md sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between h-20">
-        
-        <div class="flex items-center space-x-4">
-          <!-- LOGO RECTANGLE UN-CROPPED -->
-          <img src="https://i.ibb.co/ycG5rppn/logo.png" alt="Logo PPD" class="h-12 w-auto object-contain">
-          <div>
-            <h1 class="text-xl font-extrabold tracking-tight text-white">OPR Web App</h1>
-            <p class="text-xs text-slate-400 font-medium">Pejabat Pendidikan Daerah Petaling Utama</p>
-          </div>
-        </div>
+  <!-- MAIN CONTENT AREA -->
+  <main class="flex-1 p-4 md:p-8 overflow-y-auto relative">
 
-        <nav class="flex space-x-2 bg-slate-800/80 p-1.5 rounded-xl border border-slate-700">
-          <button onclick="switchTab('dashboard')" id="tab-dashboard" class="px-4 py-2 text-sm font-semibold rounded-lg transition bg-white text-slate-900 shadow">
-            <i class="fa-solid fa-chart-pie mr-2"></i>Dashboard
-          </button>
-          <button onclick="switchTab('form')" id="tab-form" class="px-4 py-2 text-sm font-semibold rounded-lg transition text-slate-300 hover:bg-slate-700">
-            <i class="fa-solid fa-circle-plus mr-2"></i>OPR Baru
-          </button>
-          <button onclick="switchTab('pegawai')" id="tab-pegawai" class="px-4 py-2 text-sm font-semibold rounded-lg transition text-slate-300 hover:bg-slate-700">
-            <i class="fa-solid fa-box-archive mr-2"></i>Arkib Pegawai
-          </button>
-        </nav>
+    <!-- OVERLAY SPINNER (BLUR) -->
+    <div id="blurOverlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+      <div class="bg-white p-6 rounded-2xl shadow-xl flex flex-col items-center space-y-4">
+        <i class="fa-solid fa-circle-notch fa-spin text-4xl text-indigo-600"></i>
+        <p class="text-sm font-medium text-slate-700" id="overlayText">Memproses data & menjana PDF...</p>
       </div>
     </div>
-  </header>
 
-  <!-- MAIN CONTAINER -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 custom-scrollbar">
-
-    <!-- ==================== TAB 1: DASHBOARD DATA ==================== -->
-    <section id="sec-dashboard" class="space-y-6">
-      
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
-        <div class="glass-card p-5 rounded-2xl shadow-sm flex items-center justify-between">
-          <div>
-            <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Jumlah OPR</p>
-            <h3 id="statTotalOpr" class="text-3xl font-extrabold text-slate-900 mt-1">0</h3>
-          </div>
-          <div class="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-700 text-xl">
-            <i class="fa-solid fa-file-lines"></i>
-          </div>
+    <!-- TAB 1: DASHBOARD / SENARAI OPR -->
+    <section id="tabDashboard" class="space-y-6">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-2xl font-bold text-slate-900">Senarai Laporan OPR</h2>
+          <p class="text-sm text-slate-500">Semua laporan yang telah dijana dan disimpan dalam Google Sheet.</p>
         </div>
-
-        <div class="glass-card p-5 rounded-2xl shadow-sm flex items-center justify-between">
-          <div>
-            <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Pegawai Aktif</p>
-            <h3 id="statTotalPegawai" class="text-3xl font-extrabold text-slate-900 mt-1">0</h3>
-          </div>
-          <div class="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-700 text-xl">
-            <i class="fa-solid fa-user-check"></i>
-          </div>
-        </div>
-
-        <div class="glass-card p-5 rounded-2xl shadow-sm flex items-center justify-between">
-          <div>
-            <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Bulan Ini</p>
-            <h3 id="statMonthOpr" class="text-3xl font-extrabold text-slate-900 mt-1">0</h3>
-          </div>
-          <div class="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-700 text-xl">
-            <i class="fa-solid fa-calendar-check"></i>
-          </div>
-        </div>
-
-        <div class="glass-card p-5 rounded-2xl shadow-sm flex items-center justify-between">
-          <div>
-            <p class="text-xs font-bold uppercase tracking-wider text-slate-400">PDF Dalam Drive</p>
-            <h3 id="statDrivePdf" class="text-3xl font-extrabold text-slate-900 mt-1">0</h3>
-          </div>
-          <div class="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-700 text-xl">
-            <i class="fa-brands fa-google-drive"></i>
-          </div>
-        </div>
+        <button onclick="switchTab('form')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center space-x-2 transition self-start md:self-auto">
+          <i class="fa-solid fa-plus"></i>
+          <span>Tambah Laporan Baru</span>
+        </button>
       </div>
 
-      <div class="glass-card rounded-2xl shadow-sm overflow-hidden">
-        <div class="p-5 border-b border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-50/50">
-          <div>
-            <h2 class="text-lg font-bold text-slate-900">Senarai Laporan OPR Terkini</h2>
-            <p class="text-xs text-slate-500">Rekod laporan terkemaskini secara langsung</p>
-          </div>
+      <!-- CARIAN -->
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-3">
+        <i class="fa-solid fa-magnifying-glass text-slate-400"></i>
+        <input type="text" id="searchInput" oninput="filterData()" placeholder="Cari mengikut Tajuk Program, Pegawai, atau Tarikh..." class="w-full bg-transparent border-none text-sm focus:outline-none text-slate-800">
+      </div>
 
-          <div class="flex items-center space-x-3">
-            <div class="relative">
-              <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-              <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Cari program atau pegawai..." class="pl-9 pr-4 py-2 bg-white border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-slate-900 outline-none w-64">
-            </div>
-
-            <!-- BUTANG REFRESH DENGAN PULSING EFFECT -->
-            <button id="btnRefresh" onclick="loadData(true)" class="px-4 py-2 bg-white border border-slate-300 rounded-xl text-slate-700 hover:bg-slate-100 text-xs font-bold flex items-center space-x-2 transition shadow-sm">
-              <i id="refreshSpinner" class="fa-solid fa-rotate"></i>
-              <span>Refresh Data</span>
-            </button>
-          </div>
-        </div>
-
+      <!-- TABLE LIST -->
+      <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
         <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse">
-            <thead>
-              <tr class="bg-slate-100 border-b border-slate-200 text-[11px] font-extrabold text-slate-600 uppercase tracking-wider">
-                <th class="py-3.5 px-4">Tarikh Kemaskini</th>
-                <th class="py-3.5 px-4">Tajuk Program</th>
-                <th class="py-3.5 px-4">Tarikh Pelaksanaan</th>
-                <th class="py-3.5 px-4">Pegawai Pelapor</th>
-                <th class="py-3.5 px-4 text-center">Tindakan Edit / View</th>
+          <table class="w-full text-left border-collapse text-sm">
+            <thead class="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
+              <tr>
+                <th class="p-4">Tarikh</th>
+                <th class="p-4">Tajuk Program</th>
+                <th class="p-4">Pegawai</th>
+                <th class="p-4 text-center">Fail PDF</th>
+                <th class="p-4 text-right">Tindakan</th>
               </tr>
             </thead>
-            <tbody id="oprTableBody" class="divide-y divide-slate-200 text-xs">
-              <tr>
-                <td colspan="5" class="py-12 text-center text-slate-400">
-                  <i class="fa-solid fa-spinner fa-spin text-2xl text-slate-700 mb-2"></i>
-                  <p>Memuatkan data laporan...</p>
-                </td>
-              </tr>
+            <tbody id="oprTableBody" class="divide-y divide-slate-100">
+              <!-- Render dinamik dari JS -->
             </tbody>
           </table>
         </div>
       </div>
     </section>
 
-    <!-- ==================== TAB 2: BORANG OPR & PREVIEW ==================== -->
-    <section id="sec-form" class="hidden space-y-6">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+    <!-- TAB 2: BORANG OPR & PREVIEW -->
+    <section id="tabForm" class="hidden space-y-6">
+      <div class="flex items-center justify-between border-b border-slate-200 pb-4">
+        <div>
+          <h2 class="text-2xl font-bold text-slate-900" id="formTitle">Cipta Laporan OPR</h2>
+          <p class="text-sm text-slate-500">Isi maklumat di bawah. Pratonton PDF akan digenerasi secara langsung.</p>
+        </div>
+        <button onclick="resetOprForm()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-2 rounded-lg text-xs font-medium transition">
+          Reset Borang
+        </button>
+      </div>
+
+      <form id="oprForm" onsubmit="submitForm(event)" class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
-        <!-- BORANG INPUT -->
-        <div class="lg:col-span-7 glass-card p-6 rounded-2xl shadow-sm space-y-6">
-          <div class="border-b border-slate-200 pb-4 flex items-center justify-between">
-            <div>
-              <h2 id="formTitleHeader" class="text-xl font-extrabold text-slate-900">Borang Laporan OPR Baru</h2>
-              <p class="text-xs text-slate-500">Isi maklumat program di bawah secara teliti.</p>
+        <!-- COLUMN LEFT: INPUT BORANG -->
+        <div class="space-y-6 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+          <input type="hidden" id="rowId" value="">
+
+          <div class="border-b border-slate-100 pb-4">
+            <h3 class="font-bold text-slate-800 mb-3 flex items-center space-x-2">
+              <i class="fa-solid fa-user-gear text-indigo-600"></i>
+              <span>Maklumat Pegawai & Tarikh Laporan</span>
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Pegawai</label>
+                <input type="text" id="namaPegawai" required oninput="updatePreview()" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Jawatan Pegawai</label>
+                <input type="text" id="jawatanPegawai" required oninput="updatePreview()" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none">
+              </div>
+              <div class="md:col-span-2">
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Tarikh Laporan Disediakan</label>
+                <input type="date" id="tarikhLaporan" required oninput="updatePreview()" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none">
+              </div>
             </div>
-            
-            <button type="button" onclick="resetOprForm()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl border border-slate-300 transition flex items-center space-x-1.5">
-              <i class="fa-solid fa-rotate-left"></i>
-              <span>Reset Borang</span>
-            </button>
           </div>
 
-          <form id="oprForm" onsubmit="submitForm(event)" class="space-y-5">
-            
-            <!-- HIDDEN ROW ID UNTUK FUNGSI EDIT -->
-            <input type="hidden" id="rowId" value="">
-
-            <!-- PEGAWAI -->
-            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-4">
-              <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-800 flex items-center space-x-2">
-                <i class="fa-solid fa-user-tie"></i> <span>Maklumat Pegawai Pelapor</span>
-              </h3>
-              
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-1">Nama Pegawai *</label>
-                  <select id="namaPegawai" onchange="autoFillJawatan()" required class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-slate-900 outline-none">
-                    <option value="">-- Pilih Pegawai --</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-1">Jawatan Pegawai *</label>
-                  <input type="text" id="jawatanPegawai" required placeholder="Jawatan automatik" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-slate-900 outline-none">
-                </div>
-              </div>
-
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Tarikh Laporan Disediakan *</label>
-                <input type="date" id="tarikhLaporan" onchange="updatePreview()" required class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-slate-900 outline-none">
-              </div>
-            </div>
-
-            <!-- BUTIRAN PROGRAM -->
+          <div class="border-b border-slate-100 pb-4">
+            <h3 class="font-bold text-slate-800 mb-3 flex items-center space-x-2">
+              <i class="fa-solid fa-calendar-check text-indigo-600"></i>
+              <span>Maklumat Program / Aktiviti</span>
+            </h3>
             <div class="space-y-4">
-              <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-800 flex items-center space-x-2">
-                <i class="fa-solid fa-calendar-day"></i> <span>Butiran Program / Aktiviti</span>
-              </h3>
-
               <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Tajuk Program / Aktiviti *</label>
-                <input type="text" id="tajukProgram" oninput="updatePreview()" required placeholder="Cth: BENGKEL AI STEM UNTUK GKMP" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-slate-900 outline-none">
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Tajuk Program / Aktiviti</label>
+                <input type="text" id="tajukProgram" required oninput="updatePreview()" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none">
               </div>
-
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-1">Tarikh Pelaksanaan *</label>
-                  <input type="text" id="tarikhPelaksanaan" oninput="updatePreview()" required placeholder="Cth: 11 OGOS 2026" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-slate-900 outline-none">
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">Tarikh Pelaksanaan</label>
+                  <input type="date" id="tarikhPelaksanaan" required oninput="updatePreview()" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none">
                 </div>
                 <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-1">Masa Pelaksanaan *</label>
-                  <input type="text" id="masa" oninput="updatePreview()" required placeholder="Cth: 8.00 PAGI - 5.00 PETANG" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-slate-900 outline-none">
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">Masa</label>
+                  <input type="text" id="masa" placeholder="Cth: 8:00 AM - 12:00 PM" required oninput="updatePreview()" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none">
                 </div>
               </div>
-
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-1">Kumpulan Sasaran *</label>
-                  <input type="text" id="sasaran" oninput="updatePreview()" required placeholder="Cth: 70 GURU STEM" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-slate-900 outline-none">
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">Kumpulan Sasaran</label>
+                  <input type="text" id="sasaran" required oninput="updatePreview()" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none">
                 </div>
                 <div>
-                  <!-- OPTIONAL / TIDAK WAJIB -->
-                  <label class="block text-xs font-bold text-slate-700 mb-1">Pelibatan Pihak Luar <span class="text-slate-400 font-normal">(Pilihan)</span></label>
-                  <input type="text" id="pelibatan" oninput="updatePreview()" placeholder="Cth: APPLE DAN GOOGLE" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-slate-900 outline-none">
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">Jumlah Pelibatan</label>
+                  <input type="text" id="pelibatan" required oninput="updatePreview()" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none">
                 </div>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Objektif Program</label>
+                <textarea id="objektif" rows="2" required oninput="updatePreview()" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none"></textarea>
               </div>
             </div>
+          </div>
 
-            <!-- OBJEKTIF, KEKUATAN & PENAMBAHBAIKAN WITH 'X' CLEAR BUTTON -->
+          <div class="border-b border-slate-100 pb-4">
+            <h3 class="font-bold text-slate-800 mb-3 flex items-center space-x-2">
+              <i class="fa-solid fa-chart-pie text-indigo-600"></i>
+              <span>Dapatan / Penilaian</span>
+            </h3>
             <div class="space-y-4">
-              
-              <!-- OBJEKTIF -->
               <div>
-                <div class="flex items-center justify-between mb-1">
-                  <label class="text-xs font-bold text-slate-700">🎯 Objektif Program *</label>
-                  <button type="button" onclick="getAISuggestion('objektif')" class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-bold rounded-lg border border-slate-300 transition">
-                    ✨ AI Suggestion
-                  </button>
-                </div>
-                <div class="relative">
-                  <textarea id="objektif" oninput="updatePreview()" rows="3" required placeholder="1. ..." class="w-full bg-white border border-slate-300 rounded-xl p-3 pr-8 text-xs focus:ring-2 focus:ring-slate-900 outline-none"></textarea>
-                  <button type="button" onclick="clearField('objektif')" title="Padam teks" class="absolute top-2.5 right-2.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 w-5 h-5 rounded-full flex items-center justify-center transition">
-                    <i class="fa-solid fa-xmark text-xs"></i>
-                  </button>
-                </div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Kekuatan / Kejayaan</label>
+                <textarea id="kekuatan" rows="2" required oninput="updatePreview()" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none"></textarea>
               </div>
-
-              <!-- KEKUATAN -->
               <div>
-                <div class="flex items-center justify-between mb-1">
-                  <label class="text-xs font-bold text-slate-700">💪 Kekuatan Program *</label>
-                  <button type="button" onclick="getAISuggestion('kekuatan')" class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-bold rounded-lg border border-slate-300 transition">
-                    ✨ AI Suggestion
-                  </button>
-                </div>
-                <div class="relative">
-                  <textarea id="kekuatan" oninput="updatePreview()" rows="3" required placeholder="● ..." class="w-full bg-white border border-slate-300 rounded-xl p-3 pr-8 text-xs focus:ring-2 focus:ring-slate-900 outline-none"></textarea>
-                  <button type="button" onclick="clearField('kekuatan')" title="Padam teks" class="absolute top-2.5 right-2.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 w-5 h-5 rounded-full flex items-center justify-center transition">
-                    <i class="fa-solid fa-xmark text-xs"></i>
-                  </button>
-                </div>
-              </div>
-
-              <!-- PENAMBAHBAIKAN -->
-              <div>
-                <div class="flex items-center justify-between mb-1">
-                  <label class="text-xs font-bold text-slate-700">📈 Penambahbaikan & Cadangan *</label>
-                  <button type="button" onclick="getAISuggestion('penambahbaikan')" class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-bold rounded-lg border border-slate-300 transition">
-                    ✨ AI Suggestion
-                  </button>
-                </div>
-                <div class="relative">
-                  <textarea id="penambahbaikan" oninput="updatePreview()" rows="3" required placeholder="● ..." class="w-full bg-white border border-slate-300 rounded-xl p-3 pr-8 text-xs focus:ring-2 focus:ring-slate-900 outline-none"></textarea>
-                  <button type="button" onclick="clearField('penambahbaikan')" title="Padam teks" class="absolute top-2.5 right-2.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 w-5 h-5 rounded-full flex items-center justify-center transition">
-                    <i class="fa-solid fa-xmark text-xs"></i>
-                  </button>
-                </div>
-              </div>
-
-            </div>
-
-            <!-- GAMBAR & KAPSYEN -->
-            <div class="space-y-3">
-              <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-800 flex items-center space-x-2">
-                <i class="fa-solid fa-images"></i> <span>Lampiran Bergambar (4 Gambar)</span>
-              </h3>
-
-              <!-- GAMBAR 1 (HERO IMAGE) WITH LANDSCAPE NOTE -->
-              <div class="p-3.5 border-2 border-dashed border-slate-300 rounded-xl bg-slate-50 space-y-2">
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-bold text-slate-800">Gambar 1 (Hero Background Utama)</span>
-                  <span class="text-[10px] bg-amber-100 text-amber-900 font-bold px-2 py-0.5 rounded">
-                    <i class="fa-solid fa-info-circle mr-1"></i> Disyorkan imej melintang (landscape)
-                  </span>
-                </div>
-                <input type="file" accept="image/*" onchange="handleImageUpload(event, 1)" class="text-[11px] text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-[11px] file:bg-slate-800 file:text-white">
-                <input type="text" id="kapsyen1" oninput="updatePreview()" placeholder="Kapsyen Gambar Utama (Pilihan)" class="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1 text-xs outline-none">
-              </div>
-
-              <!-- GAMBAR 2, 3, 4 -->
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                
-                <div class="p-3 border border-slate-200 rounded-xl bg-slate-50 space-y-2">
-                  <div class="flex items-center justify-between">
-                    <span class="text-[11px] font-bold text-slate-800">Gambar 2</span>
-                  </div>
-                  <p class="text-[9px] text-amber-800 font-medium"><i class="fa-solid fa-info-circle mr-1"></i>Disyorkan melintang</p>
-                  <input type="file" accept="image/*" onchange="handleImageUpload(event, 2)" class="text-[10px] text-slate-500 file:mr-1 file:py-0.5 file:px-1.5 file:rounded file:border-0 file:text-[10px] file:bg-slate-200 file:text-slate-800">
-                  <input type="text" id="kapsyen2" oninput="updatePreview()" placeholder="Kapsyen Gambar 2" class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1 text-[11px] outline-none">
-                </div>
-
-                <div class="p-3 border border-slate-200 rounded-xl bg-slate-50 space-y-2">
-                  <span class="text-[11px] font-bold text-slate-800 block">Gambar 3</span>
-                  <input type="file" accept="image/*" onchange="handleImageUpload(event, 3)" class="text-[10px] text-slate-500 file:mr-1 file:py-0.5 file:px-1.5 file:rounded file:border-0 file:text-[10px] file:bg-slate-200 file:text-slate-800">
-                  <input type="text" id="kapsyen3" oninput="updatePreview()" placeholder="Kapsyen Gambar 3" class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1 text-[11px] outline-none">
-                </div>
-
-                <div class="p-3 border border-slate-200 rounded-xl bg-slate-50 space-y-2">
-                  <span class="text-[11px] font-bold text-slate-800 block">Gambar 4</span>
-                  <input type="file" accept="image/*" onchange="handleImageUpload(event, 4)" class="text-[10px] text-slate-500 file:mr-1 file:py-0.5 file:px-1.5 file:rounded file:border-0 file:text-[10px] file:bg-slate-200 file:text-slate-800">
-                  <input type="text" id="kapsyen4" oninput="updatePreview()" placeholder="Kapsyen Gambar 4" class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1 text-[11px] outline-none">
-                </div>
-
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Penambahbaikan / Cabaran</label>
+                <textarea id="penambahbaikan" rows="2" required oninput="updatePreview()" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none"></textarea>
               </div>
             </div>
+          </div>
 
-            <!-- SUBMIT BUTTON -->
-            <button type="submit" id="submitBtn" class="w-full py-3.5 bg-slate-900 hover:bg-slate-800 text-white font-extrabold rounded-xl shadow-lg transition flex items-center justify-center space-x-2 text-sm">
-              <i class="fa-solid fa-paper-plane"></i>
-              <span id="submitBtnText">Hantar & Jana PDF Dalam Drive</span>
-            </button>
-          </form>
+          <!-- MUAT NAIK 4 GAMBAR & KAPSYEN -->
+          <div>
+            <h3 class="font-bold text-slate-800 mb-3 flex items-center space-x-2">
+              <i class="fa-solid fa-images text-indigo-600"></i>
+              <span>Gambar Aktiviti (Maksimum 4)</span>
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- GAMBAR 1 -->
+              <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                <label class="block text-xs font-bold text-slate-700 mb-1">Gambar 1</label>
+                <input type="file" accept="image/*" onchange="handleImageUpload(event, 1)" class="text-xs mb-2 w-full">
+                <input type="text" id="kapsyen1" placeholder="Kapsyen Gambar 1" oninput="updatePreview()" class="w-full border border-slate-300 rounded p-1.5 text-xs">
+              </div>
+              <!-- GAMBAR 2 -->
+              <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                <label class="block text-xs font-bold text-slate-700 mb-1">Gambar 2</label>
+                <input type="file" accept="image/*" onchange="handleImageUpload(event, 2)" class="text-xs mb-2 w-full">
+                <input type="text" id="kapsyen2" placeholder="Kapsyen Gambar 2" oninput="updatePreview()" class="w-full border border-slate-300 rounded p-1.5 text-xs">
+              </div>
+              <!-- GAMBAR 3 -->
+              <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                <label class="block text-xs font-bold text-slate-700 mb-1">Gambar 3</label>
+                <input type="file" accept="image/*" onchange="handleImageUpload(event, 3)" class="text-xs mb-2 w-full">
+                <input type="text" id="kapsyen3" placeholder="Kapsyen Gambar 3" oninput="updatePreview()" class="w-full border border-slate-300 rounded p-1.5 text-xs">
+              </div>
+              <!-- GAMBAR 4 -->
+              <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                <label class="block text-xs font-bold text-slate-700 mb-1">Gambar 4</label>
+                <input type="file" accept="image/*" onchange="handleImageUpload(event, 4)" class="text-xs mb-2 w-full">
+                <input type="text" id="kapsyen4" placeholder="Kapsyen Gambar 4" oninput="updatePreview()" class="w-full border border-slate-300 rounded p-1.5 text-xs">
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg shadow transition flex items-center justify-center space-x-2">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            <span>Simpan Laporan & Jana PDF</span>
+          </button>
+
         </div>
 
-        <!-- LIVE PREVIEW CONTAINER (MONOCHROME CORPORATE THEME - ZERO STATE INITIALLY) -->
-        <div class="lg:col-span-5 space-y-4">
-          <div class="sticky top-28 space-y-3">
-            <div class="flex items-center justify-between">
-              <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center space-x-2">
-                <i class="fa-solid fa-eye text-slate-900"></i> <span>Pratonton Live OPR</span>
-              </h3>
-              <span class="text-[10px] bg-slate-200 text-slate-800 font-bold px-2.5 py-0.5 rounded-full">100% Identikal PDF</span>
-            </div>
+        <!-- COLUMN RIGHT: PRATONTON TEMPLATE PDF (A4 PREVIEW) -->
+        <div class="flex flex-col items-center">
+          <div class="w-full flex justify-between items-center mb-2 px-1">
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Pratonton PDF (A4)</span>
+          </div>
 
-            <!-- CONTAINER YANG AKAN DITANGKAP SEBAGAI PDF VIA HTML2PDF.JS -->
-            <div id="pdfTemplate" class="bg-white border border-slate-300 shadow-xl rounded-xl p-5 text-[10px] text-slate-900 space-y-3 font-sans leading-relaxed">
-              
-              <!-- HEADER BANNER MONOCHROME DENGAN LOGO UN-CROPPED -->
-              <div class="bg-slate-900 text-white p-3 rounded-lg flex items-center space-x-3">
-                <img src="https://i.ibb.co/ycG5rppn/logo.png" class="h-10 w-auto object-contain">
-                <div class="flex-1 text-center">
-                  <h4 class="font-extrabold text-[9.5px] uppercase tracking-tight">
-                    LAPORAN RINGKAS PROGRAM / AKTIVITI <span style="white-space: nowrap;">(ONE PAGE REPORT)</span>
-                  </h4>
-                  <p class="text-[8px] text-slate-300 font-semibold uppercase mt-0.5">PEJABAT PENDIDIKAN DAERAH PETALING UTAMA</p>
-                  <p class="text-[7.5px] text-slate-400 italic font-normal mt-0.5">"PENDIDIKAN BERMUTU, INSAN TERDIDIK, NEGARA SEJAHTERA"</p>
-                </div>
-              </div>
-
-              <!-- HERO IMAGE DENGAN OVERLAY TAJUK PROGRAM -->
-              <div id="prevHeroBox" class="relative w-full h-36 bg-slate-900 rounded-lg overflow-hidden shadow-inner flex items-end border border-slate-200">
-                <img id="prevImg1" class="absolute inset-0 w-full h-full object-cover hidden">
-                <div class="relative z-10 w-full bg-gradient-to-t from-slate-950 via-slate-950/80 to-transparent p-3 text-white">
-                  <h2 id="prevTajuk" class="text-xs font-extrabold uppercase tracking-wide leading-tight drop-shadow">
-                    [ Tajuk Program ]
-                  </h2>
-                </div>
-              </div>
-
-              <!-- HIGH IMPACT INFO SECTION -->
-              <div class="bg-slate-50 border border-slate-200 rounded-lg p-2 text-center space-y-0.5">
-                <div class="text-[9px] font-extrabold text-slate-800 uppercase">
-                  📅 <span id="prevTarikh">[ Tarikh ]</span> &nbsp;&nbsp;|&nbsp;&nbsp; ⏰ <span id="prevMasa">[ Masa ]</span>
-                </div>
-                <div class="text-[9.5px] font-extrabold text-slate-900 uppercase">
-                  🎯 <span id="prevSasaran">[ Kumpulan Sasaran ]</span> TERLIBAT
-                </div>
-                <div id="prevPelibatanBox" class="text-[8.5px] font-bold text-slate-600 uppercase hidden">
-                  🤝 DENGAN KERJASAMA: <span id="prevPelibatan">-</span>
-                </div>
-              </div>
-
-              <!-- KAD OBJEKTIF -->
-              <div class="border rounded-lg p-2.5 bg-slate-50 border-slate-200">
-                <p class="font-extrabold text-slate-900 text-[9px] uppercase">🎯 OBJEKTIF PROGRAM</p>
-                <p id="prevObjektif" class="whitespace-pre-wrap text-slate-700 mt-1">[ Objektif Program ]</p>
-              </div>
-
-              <!-- KAD KEKUATAN -->
-              <div class="border rounded-lg p-2.5 bg-slate-50 border-slate-200">
-                <p class="font-extrabold text-slate-900 text-[9px] uppercase">💪 KEKUATAN</p>
-                <p id="prevKekuatan" class="whitespace-pre-wrap text-slate-700 mt-1">[ Kekuatan Program ]</p>
-              </div>
-
-              <!-- KAD PENAMBAHBAIKAN -->
-              <div class="border rounded-lg p-2.5 bg-slate-50 border-slate-200">
-                <p class="font-extrabold text-slate-900 text-[9px] uppercase">📈 PENAMBAHBAIKAN & CADANGAN</p>
-                <p id="prevPenambahbaikan" class="whitespace-pre-wrap text-slate-700 mt-1">[ Penambahbaikan & Cadangan ]</p>
-              </div>
-
-              <!-- GAMBAR GRID 2, 3, 4 -->
-              <div id="prevGalleryBox" class="border rounded-lg p-2 bg-white border-slate-200 space-y-2">
-                <p class="font-extrabold text-slate-900 text-[8.5px] uppercase">📸 LAMPIRAN BERGAMBAR</p>
-                
-                <!-- GAMBAR 2 (TOP FULL WIDTH) -->
-                <div id="boxImg2" class="border rounded p-1 text-center bg-slate-50 hidden">
-                  <img id="prevImg2" class="h-24 w-full object-cover rounded">
-                  <span id="prevCap2" class="text-[8px] text-slate-500 italic block mt-0.5">Gambar 2</span>
-                </div>
-
-                <!-- GAMBAR 3 & 4 (BOTTOM HALF GRID) -->
-                <div class="grid grid-cols-2 gap-2">
-                  <div id="boxImg3" class="border rounded p-1 text-center bg-slate-50 hidden">
-                    <img id="prevImg3" class="h-20 w-full object-cover rounded">
-                    <span id="prevCap3" class="text-[8px] text-slate-500 italic block mt-0.5">Gambar 3</span>
+          <div class="w-full overflow-x-auto bg-slate-200 p-4 rounded-xl flex justify-center">
+            <!-- TEMPLATE UNTUK GENERATE PDF -->
+            <div id="pdfTemplate" class="a4-page p-8 text-slate-900 flex flex-col justify-between text-xs leading-relaxed bg-white" style="font-family: Arial, sans-serif;">
+              <div>
+                <!-- HEADER TEMPLATE -->
+                <div class="flex items-center justify-between border-b-2 border-slate-800 pb-3 mb-4">
+                  <div class="flex items-center space-x-3">
+                    <img src="https://i.ibb.co/ycG5rppn/logo.png" crossorigin="anonymous" class="h-10 w-auto object-contain" alt="Logo">
+                    <div>
+                      <h1 class="text-base font-bold uppercase tracking-wide leading-tight">One Page Report (OPR)</h1>
+                      <p class="text-[10px] text-slate-600">Laporan Ringkas Pelaksanaan Aktiviti / Program</p>
+                    </div>
                   </div>
-                  <div id="boxImg4" class="border rounded p-1 text-center bg-slate-50 hidden">
-                    <img id="prevImg4" class="h-20 w-full object-cover rounded">
-                    <span id="prevCap4" class="text-[8px] text-slate-500 italic block mt-0.5">Gambar 4</span>
+                  <div class="text-right text-[10px] text-slate-500">
+                    <p>Tarikh Laporan: <span id="pvTarikhLaporan" class="font-bold text-slate-800">-</span></p>
                   </div>
                 </div>
-              </div>
 
-              <!-- FOOTER PREVIEW -->
-              <div class="pt-2 text-[8.5px] border-t border-slate-200 text-slate-600 flex justify-between items-end">
+                <!-- JADUAL MAKLUMAT UTAMA -->
+                <table class="w-full border-collapse mb-4 border border-slate-300 text-[11px]">
+                  <tbody>
+                    <tr class="border-b border-slate-300">
+                      <td class="bg-slate-100 font-bold p-2 w-1/4 border-r border-slate-300">Tajuk Program</td>
+                      <td id="pvTajukProgram" class="p-2 font-semibold text-indigo-900" colspan="3">-</td>
+                    </tr>
+                    <tr class="border-b border-slate-300">
+                      <td class="bg-slate-100 font-bold p-2 border-r border-slate-300">Tarikh Pelaksanaan</td>
+                      <td id="pvTarikhPelaksanaan" class="p-2 border-r border-slate-300 w-1/4">-</td>
+                      <td class="bg-slate-100 font-bold p-2 border-r border-slate-300 w-1/4">Masa</td>
+                      <td id="pvMasa" class="p-2 w-1/4">-</td>
+                    </tr>
+                    <tr class="border-b border-slate-300">
+                      <td class="bg-slate-100 font-bold p-2 border-r border-slate-300">Kumpulan Sasaran</td>
+                      <td id="pvSasaran" class="p-2 border-r border-slate-300">-</td>
+                      <td class="bg-slate-100 font-bold p-2 border-r border-slate-300">Jumlah Pelibatan</td>
+                      <td id="pvPelibatan" class="p-2">-</td>
+                    </tr>
+                    <tr>
+                      <td class="bg-slate-100 font-bold p-2 border-r border-slate-300">Pegawai Bertanggungjawab</td>
+                      <td id="pvPegawai" class="p-2" colspan="3">-</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <!-- OBJEKTIF & DAPATAN -->
+                <div class="space-y-3 mb-4 text-[11px]">
+                  <div class="border border-slate-300 rounded p-2.5 bg-slate-50/50">
+                    <h4 class="font-bold text-indigo-900 mb-1 border-b border-slate-200 pb-1 uppercase text-[10px]">1. Objektif Program</h4>
+                    <p id="pvObjektif" class="whitespace-pre-line text-slate-700">-</p>
+                  </div>
+                  
+                  <div class="grid grid-cols-2 gap-3">
+                    <div class="border border-slate-300 rounded p-2.5 bg-slate-50/50">
+                      <h4 class="font-bold text-emerald-800 mb-1 border-b border-slate-200 pb-1 uppercase text-[10px]">2. Kekuatan / Kejayaan</h4>
+                      <p id="pvKekuatan" class="whitespace-pre-line text-slate-700">-</p>
+                    </div>
+                    <div class="border border-slate-300 rounded p-2.5 bg-slate-50/50">
+                      <h4 class="font-bold text-amber-800 mb-1 border-b border-slate-200 pb-1 uppercase text-[10px]">3. Penambahbaikan</h4>
+                      <p id="pvPenambahbaikan" class="whitespace-pre-line text-slate-700">-</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- GRID GAMBAR (2x2) -->
                 <div>
-                  <p><strong>Disediakan oleh:</strong> <span id="prevNama">[ Nama Pegawai ]</span> (<span id="prevJawatan">[ Jawatan ]</span>)</p>
-                  <p><strong>Tarikh Laporan:</strong> <span id="prevTarikhLaporan">[ Tarikh Laporan ]</span></p>
-                </div>
-                <div class="text-right text-[7.5px] text-slate-400">
-                  OPR Web App PPDPU
+                  <h4 class="font-bold text-slate-800 mb-2 uppercase text-[10px] tracking-wider">Gambar Laporan / Dokumentasi</h4>
+                  <div class="grid grid-cols-2 gap-3">
+                    <!-- GAMBAR 1 -->
+                    <div class="border border-slate-300 rounded p-1.5 flex flex-col items-center bg-slate-50">
+                      <div class="w-full h-32 bg-slate-200 rounded overflow-hidden flex items-center justify-center relative">
+                        <img id="prevImg1" crossorigin="anonymous" class="absolute inset-0 w-full h-full object-cover hidden" alt="Gambar 1">
+                        <span id="placeholder1" class="text-slate-400 text-[10px]">Tiada Gambar 1</span>
+                      </div>
+                      <p id="pvKapsyen1" class="text-[10px] text-center mt-1 text-slate-600 italic font-medium min-h-[14px]"></p>
+                    </div>
+                    <!-- GAMBAR 2 -->
+                    <div class="border border-slate-300 rounded p-1.5 flex flex-col items-center bg-slate-50">
+                      <div class="w-full h-32 bg-slate-200 rounded overflow-hidden flex items-center justify-center relative">
+                        <img id="prevImg2" crossorigin="anonymous" class="absolute inset-0 w-full h-full object-cover hidden" alt="Gambar 2">
+                        <span id="placeholder2" class="text-slate-400 text-[10px]">Tiada Gambar 2</span>
+                      </div>
+                      <p id="pvKapsyen2" class="text-[10px] text-center mt-1 text-slate-600 italic font-medium min-h-[14px]"></p>
+                    </div>
+                    <!-- GAMBAR 3 -->
+                    <div class="border border-slate-300 rounded p-1.5 flex flex-col items-center bg-slate-50">
+                      <div class="w-full h-32 bg-slate-200 rounded overflow-hidden flex items-center justify-center relative">
+                        <img id="prevImg3" crossorigin="anonymous" class="absolute inset-0 w-full h-full object-cover hidden" alt="Gambar 3">
+                        <span id="placeholder3" class="text-slate-400 text-[10px]">Tiada Gambar 3</span>
+                      </div>
+                      <p id="pvKapsyen3" class="text-[10px] text-center mt-1 text-slate-600 italic font-medium min-h-[14px]"></p>
+                    </div>
+                    <!-- GAMBAR 4 -->
+                    <div class="border border-slate-300 rounded p-1.5 flex flex-col items-center bg-slate-50">
+                      <div class="w-full h-32 bg-slate-200 rounded overflow-hidden flex items-center justify-center relative">
+                        <img id="prevImg4" crossorigin="anonymous" class="absolute inset-0 w-full h-full object-cover hidden" alt="Gambar 4">
+                        <span id="placeholder4" class="text-slate-400 text-[10px]">Tiada Gambar 4</span>
+                      </div>
+                      <p id="pvKapsyen4" class="text-[10px] text-center mt-1 text-slate-600 italic font-medium min-h-[14px]"></p>
+                    </div>
+                  </div>
                 </div>
               </div>
 
+              <!-- FOOTER PDF -->
+              <div class="border-t border-slate-200 pt-2 mt-4 text-[9px] text-slate-400 flex justify-between items-center">
+                <span>Laporan ini dijana secara automatik menerusi Sistem OPR Web App.</span>
+                <span>Muka Surat 1 daripada 1</span>
+              </div>
             </div>
           </div>
         </div>
 
-      </div>
-    </section>
-
-    <!-- ==================== TAB 3: ARKIB OPR ==================== -->
-    <section id="sec-pegawai" class="hidden space-y-6">
-      <div class="glass-card p-6 rounded-2xl shadow-sm">
-        <h2 class="text-lg font-bold text-slate-900 mb-1">Arkib OPR Pegawai</h2>
-        <p class="text-xs text-slate-500 mb-6">Klik mana-mana profil pegawai di bawah untuk melihat sejarah laporan OPR.</p>
-
-        <div id="pegawaiGrid" class="grid grid-cols-1 md:grid-cols-3 gap-5">
-        </div>
-      </div>
+      </form>
     </section>
 
   </main>
 
-  <!-- MODAL HISTORY PEGAWAI -->
-  <div id="historyModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-3xl w-full p-6 shadow-2xl border border-slate-200 max-h-[85vh] flex flex-col">
-      <div class="flex justify-between items-center pb-4 border-b border-slate-200">
-        <div>
-          <h3 id="modalPegawaiName" class="text-lg font-bold text-slate-900">Sejarah OPR Pegawai</h3>
-          <p id="modalPegawaiJawatan" class="text-xs text-slate-500">Jawatan</p>
-        </div>
-        <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 text-lg w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-
-      <div id="modalOprList" class="flex-1 overflow-y-auto py-4 space-y-3 custom-scrollbar">
-      </div>
-    </div>
-  </div>
-
+  <!-- JAVASCRIPT LOGIK -->
   <script>
-    // URL GOOGLE APPS SCRIPT WEB APP
-    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbztMcysl_dpoNqXZQacyk5qqM42XvgbxDNZuQ54tJtB7yNz4rHOznQYXHrA0tO1n9mIyw/exec";
+    // URL Web App Apps Script
+    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwroP7IIRCk2L_viuqvU34gioj95DLOk7IPRAkw_Pb-m2-loDyn89cxc332O18Kdv7i6Q/exec";
 
     let state = {
-      pegawai: [],
-      respon: [],
+      allData: [],
       images: { 1: null, 2: null, 3: null, 4: null }
     };
 
-    document.addEventListener("DOMContentLoaded", function() {
-      const today = new Date().toISOString().split('T')[0];
-      document.getElementById("tarikhLaporan").value = today;
-
+    window.addEventListener('DOMContentLoaded', () => {
       loadData();
     });
 
-    function switchTab(tab) {
-      document.getElementById("sec-dashboard").classList.add("hidden");
-      document.getElementById("sec-form").classList.add("hidden");
-      document.getElementById("sec-pegawai").classList.add("hidden");
+    // 1. TUKAR TAB (DASHBOARD / FORM)
+    function switchTab(tabName) {
+      const tabDash = document.getElementById('tabDashboard');
+      const tabForm = document.getElementById('tabForm');
+      const navDash = document.getElementById('navDashboard');
+      const navForm = document.getElementById('navForm');
 
-      document.getElementById("tab-dashboard").className = "px-4 py-2 text-sm font-semibold rounded-lg transition text-slate-300 hover:bg-slate-700";
-      document.getElementById("tab-form").className = "px-4 py-2 text-sm font-semibold rounded-lg transition text-slate-300 hover:bg-slate-700";
-      document.getElementById("tab-pegawai").className = "px-4 py-2 text-sm font-semibold rounded-lg transition text-slate-300 hover:bg-slate-700";
-
-      document.getElementById("sec-" + tab).classList.remove("hidden");
-      const activeBtn = document.getElementById("tab-" + tab);
-      activeBtn.className = "px-4 py-2 text-sm font-semibold rounded-lg transition bg-white text-slate-900 shadow";
+      if (tabName === 'dashboard') {
+        tabDash.classList.remove('hidden');
+        tabForm.classList.add('hidden');
+        navDash.className = "w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition bg-indigo-600 text-white font-medium";
+        navForm.className = "w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition hover:bg-slate-800 text-slate-300 font-medium";
+      } else {
+        tabDash.classList.add('hidden');
+        tabForm.classList.remove('hidden');
+        navForm.className = "w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition bg-indigo-600 text-white font-medium";
+        navDash.className = "w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition hover:bg-slate-800 text-slate-300 font-medium";
+      }
     }
 
-    // TARIK DATA + PULSING EFFECT
-    async function loadData(isRefresh = false) {
-      const btnRefresh = document.getElementById("btnRefresh");
-      const refreshSpinner = document.getElementById("refreshSpinner");
-
-      if (isRefresh) {
-        btnRefresh.classList.add("pulsing-refresh");
-        refreshSpinner.classList.add("fa-spin");
+    // 2. MUAT DOKUMEN/DATA DARI BACKEND
+    async function loadData(silent = false) {
+      if (!silent) {
+        document.getElementById('blurOverlay').classList.remove('hidden');
+        document.getElementById('overlayText').innerText = "Muat turun data laporan...";
       }
 
       try {
-        const response = await fetch(`${GAS_WEB_APP_URL}?action=getInitialData`);
-        const result = await response.json();
-
-        if (result.status === "success") {
-          state.pegawai = result.pegawai || [];
-          state.respon = result.respon || [];
-
-          renderStats();
-          renderTable(state.respon);
-          populatePegawaiDropdown();
-          renderPegawaiGrid();
-        }
-      } catch (err) {
-        console.error("Gagal tarik data:", err);
-      } finally {
-        if (isRefresh) {
-          setTimeout(() => {
-            btnRefresh.classList.remove("pulsing-refresh");
-            refreshSpinner.classList.remove("fa-spin");
-          }, 600);
-        }
-      }
-    }
-
-    function renderStats() {
-      document.getElementById("statTotalOpr").innerText = state.respon.length;
-      document.getElementById("statTotalPegawai").innerText = state.pegawai.length;
-      
-      const thisMonth = new Date().getMonth();
-      const countMonth = state.respon.filter(r => r.timestamp && new Date(r.timestamp).getMonth() === thisMonth).length;
-      document.getElementById("statMonthOpr").innerText = countMonth;
-      
-      const pdfCount = state.respon.filter(r => r.pautanPdf && r.pautanPdf !== "#").length;
-      document.getElementById("statDrivePdf").innerText = pdfCount;
-    }
-
-    function renderTable(data) {
-      const tbody = document.getElementById("oprTableBody");
-      if (data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-slate-400">Tiada laporan OPR direkodkan lagi.</td></tr>`;
-        return;
-      }
-
-      tbody.innerHTML = data.map(r => `
-        <tr class="hover:bg-slate-50 transition border-b border-slate-100">
-          <td class="py-3 px-4 font-mono text-[11px] text-slate-500">${r.timestamp || '-'}</td>
-          <td class="py-3 px-4 font-bold text-slate-800">${r.tajukProgram}</td>
-          <td class="py-3 px-4 text-slate-600">${r.tarikhPelaksanaan}</td>
-          <td class="py-3 px-4 font-medium text-slate-700">${r.namaPegawai}</td>
-          <td class="py-3 px-4 text-center space-x-2">
-            <!-- BUTANG EDIT -->
-            <button onclick="editOpr(${r.rowId})" class="px-2.5 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-lg font-bold text-[11px] transition border border-amber-300">
-              <i class="fa-solid fa-pen-to-square mr-1"></i>Edit
-            </button>
-            <!-- BUTANG VIEW PDF -->
-            <a href="${r.pautanPdf}" target="_blank" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-900 text-white rounded-lg font-bold text-[11px] transition inline-block">
-              <i class="fa-solid fa-file-pdf mr-1"></i>PDF
-            </a>
-          </td>
-        </tr>
-      `).join("");
-    }
-
-    function filterTable() {
-      const q = document.getElementById("searchInput").value.toLowerCase();
-      const filtered = state.respon.filter(r => 
-        r.tajukProgram.toLowerCase().includes(q) || 
-        r.namaPegawai.toLowerCase().includes(q)
-      );
-      renderTable(filtered);
-    }
-
-    function populatePegawaiDropdown() {
-      const select = document.getElementById("namaPegawai");
-      select.innerHTML = '<option value="">-- Pilih Pegawai --</option>' + 
-        state.pegawai.map(p => `<option value="${p.nama}">${p.nama}</option>`).join("");
-    }
-
-    function autoFillJawatan() {
-      const selectedName = document.getElementById("namaPegawai").value;
-      const found = state.pegawai.find(p => p.nama === selectedName);
-      if (found) {
-        document.getElementById("jawatanPegawai").value = found.jawatan;
-      }
-      updatePreview();
-    }
-
-    // AI SUGGESTION
-    async function getAISuggestion(fieldType) {
-      const tajuk = document.getElementById("tajukProgram").value;
-      const sasaran = document.getElementById("sasaran").value;
-      const pelibatan = document.getElementById("pelibatan").value;
-
-      if (!tajuk) {
-        alert("Sila isi 'Tajuk Program' terlebih dahulu.");
-        document.getElementById("tajukProgram").focus();
-        return;
-      }
-
-      const targetField = document.getElementById(fieldType);
-      const originalText = targetField.value;
-      targetField.value = "🤖 Generasi cadangan AI sedang dibuat...";
-
-      try {
-        const response = await fetch(GAS_WEB_APP_URL, {
-          method: "POST",
-          body: JSON.stringify({
-            action: "generateAI",
-            fieldType: fieldType,
-            tajukProgram: tajuk,
-            sasaran: sasaran,
-            pelibatan: pelibatan
-          })
-        });
-
-        const result = await response.json();
-        if (result.status === "success" && result.text) {
-          targetField.value = result.text;
-          updatePreview();
-        } else {
-          targetField.value = originalText;
-        }
-      } catch (err) {
-        targetField.value = originalText;
-      }
-    }
-
-    // CLEAR FIELD VIA 'X' BUTTON
-    function clearField(fieldId) {
-      document.getElementById(fieldId).value = "";
-      updatePreview();
-    }
-
-    // POPULATE FORM UNTUK MOD EDIT OPR
-    function editOpr(rowId) {
-      const found = state.respon.find(r => r.rowId === rowId);
-      if (!found) return;
-
-      document.getElementById("rowId").value = found.rowId;
-      document.getElementById("formTitleHeader").innerText = "✏️ Edit & Kemaskini Laporan OPR";
-      document.getElementById("submitBtnText").innerText = "Kemaskini Laporan OPR";
-
-      document.getElementById("namaPegawai").value = found.namaPegawai;
-      document.getElementById("jawatanPegawai").value = found.jawatanPegawai;
-      document.getElementById("tarikhLaporan").value = found.tarikhLaporan;
-
-      document.getElementById("tajukProgram").value = found.tajukProgram;
-      document.getElementById("tarikhPelaksanaan").value = found.tarikhPelaksanaan;
-      document.getElementById("masa").value = found.masa;
-      document.getElementById("sasaran").value = found.sasaran;
-      document.getElementById("pelibatan").value = found.pelibatan === "-" ? "" : found.pelibatan;
-
-      document.getElementById("objektif").value = found.objektif;
-      document.getElementById("kekuatan").value = found.kekuatan;
-      document.getElementById("penambahbaikan").value = found.penambahbaikan;
-
-      document.getElementById("kapsyen1").value = found.kapsyen1;
-      document.getElementById("kapsyen2").value = found.kapsyen2;
-      document.getElementById("kapsyen3").value = found.kapsyen3;
-      document.getElementById("kapsyen4").value = found.kapsyen4;
-
-      // Gambar
-      state.images = {
-        1: found.gambar1,
-        2: found.gambar2,
-        3: found.gambar3,
-        4: found.gambar4
-      };
-
-      if (found.gambar1) {
-        const img1 = document.getElementById("prevImg1");
-        img1.src = found.gambar1;
-        img1.classList.remove("hidden");
-      }
-
-      for (let i = 2; i <= 4; i++) {
-        if (found[`gambar${i}`]) {
-          const img = document.getElementById(`prevImg${i}`);
-          img.src = found[`gambar${i}`];
-          document.getElementById(`boxImg${i}`).classList.remove("hidden");
-        }
-      }
-
-      updatePreview();
-      switchTab('form');
-    }
-
-    function resetOprForm() {
-      if (confirm("Adakah anda pasti untuk mengosongkan borang ini?")) {
-        document.getElementById("oprForm").reset();
-        document.getElementById("rowId").value = "";
-        document.getElementById("formTitleHeader").innerText = "Borang Laporan OPR Baru";
-        document.getElementById("submitBtnText").innerText = "Hantar & Jana PDF Dalam Drive";
-
-        state.images = { 1: null, 2: null, 3: null, 4: null };
+        const res = await fetch(`${GAS_WEB_APP_URL}?action=getOprList`);
+        const json = await res.json();
         
-        document.getElementById("prevImg1").classList.add("hidden");
-        document.getElementById("boxImg2").classList.add("hidden");
-        document.getElementById("boxImg3").classList.add("hidden");
-        document.getElementById("boxImg4").classList.add("hidden");
-
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById("tarikhLaporan").value = today;
-        updatePreview();
+        if (json.status === "success") {
+          state.allData = json.data;
+          renderDashboard(state.allData);
+        } else {
+          alert("Gagal memuatkan data: " + json.message);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        document.getElementById('blurOverlay').classList.add('hidden');
       }
     }
 
+    // 3. RENDER DASHBOARD TABLE
+    function renderDashboard(dataList) {
+      const tbody = document.getElementById('oprTableBody');
+      tbody.innerHTML = '';
+
+      if (!dataList || dataList.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400">Tiada rekod laporan dijumpai.</td></tr>`;
+        return;
+      }
+
+      dataList.forEach((row, idx) => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
+        
+        const pdfLinkHtml = row.pdfUrl 
+          ? `<a href="${row.pdfUrl}" target="_blank" class="inline-flex items-center space-x-1 text-xs text-indigo-600 hover:text-indigo-800 font-semibold bg-indigo-50 px-2.5 py-1 rounded-full"><i class="fa-solid fa-file-pdf"></i><span>Buka PDF</span></a>`
+          : `<span class="text-slate-400 text-xs">Tiada Fail</span>`;
+
+        tr.innerHTML = `
+          <td class="p-4 font-medium text-slate-700">${row.tarikhPelaksanaan || row.tarikhLaporan || '-'}</td>
+          <td class="p-4 font-bold text-slate-900">${row.tajukProgram || '-'}</td>
+          <td class="p-4 text-slate-600">${row.namaPegawai || '-'}<br><span class="text-xs text-slate-400">${row.jawatanPegawai || ''}</span></td>
+          <td class="p-4 text-center">${pdfLinkHtml}</td>
+          <td class="p-4 text-right space-x-2">
+            <button onclick="editOpr(${idx})" class="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition" title="Edit"><i class="fa-solid fa-pen"></i></button>
+            <button onclick="deleteOpr('${row.rowId}')" class="p-2 text-rose-600 hover:bg-rose-50 rounded-lg transition" title="Padam"><i class="fa-solid fa-trash"></i></button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // 4. PENAPISAN CARIAN
+    function filterData() {
+      const query = document.getElementById('searchInput').value.toLowerCase();
+      const filtered = state.allData.filter(item => {
+        return (item.tajukProgram && item.tajukProgram.toLowerCase().includes(query)) ||
+               (item.namaPegawai && item.namaPegawai.toLowerCase().includes(query)) ||
+               (item.tarikhPelaksanaan && item.tarikhPelaksanaan.toLowerCase().includes(query));
+      });
+      renderDashboard(filtered);
+    }
+
+    // 5. UPDATE PRATONTON REAL-TIME
+    function updatePreview() {
+      document.getElementById('pvTarikhLaporan').innerText = document.getElementById('tarikhLaporan').value || '-';
+      document.getElementById('pvTajukProgram').innerText = document.getElementById('tajukProgram').value || '-';
+      document.getElementById('pvTarikhPelaksanaan').innerText = document.getElementById('tarikhPelaksanaan').value || '-';
+      document.getElementById('pvMasa').innerText = document.getElementById('masa').value || '-';
+      document.getElementById('pvSasaran').innerText = document.getElementById('sasaran').value || '-';
+      document.getElementById('pvPelibatan').innerText = document.getElementById('pelibatan').value || '-';
+      
+      const pegawai = document.getElementById('namaPegawai').value;
+      const jawatan = document.getElementById('jawatanPegawai').value;
+      document.getElementById('pvPegawai').innerText = pegawai ? `${pegawai} (${jawatan})` : '-';
+
+      document.getElementById('pvObjektif').innerText = document.getElementById('objektif').value || '-';
+      document.getElementById('pvKekuatan').innerText = document.getElementById('kekuatan').value || '-';
+      document.getElementById('pvPenambahbaikan').innerText = document.getElementById('penambahbaikan').value || '-';
+
+      document.getElementById('pvKapsyen1').innerText = document.getElementById('kapsyen1').value;
+      document.getElementById('pvKapsyen2').innerText = document.getElementById('kapsyen2').value;
+      document.getElementById('pvKapsyen3').innerText = document.getElementById('kapsyen3').value;
+      document.getElementById('pvKapsyen4').innerText = document.getElementById('kapsyen4').value;
+    }
+
+    // 6. HANDLE IMAGE UPLOAD & PREVIEW BASE64
     function handleImageUpload(e, index) {
       const file = e.target.files[0];
+      const imgElem = document.getElementById(`prevImg${index}`);
+      const placeholder = document.getElementById(`placeholder${index}`);
+
       if (file) {
         const reader = new FileReader();
         reader.onload = function(evt) {
           state.images[index] = evt.target.result;
-          
-          if (index === 1) {
-            const imgEl = document.getElementById("prevImg1");
-            imgEl.src = evt.target.result;
-            imgEl.classList.remove("hidden");
-          } else {
-            const imgEl = document.getElementById(`prevImg${index}`);
-            imgEl.src = evt.target.result;
-            document.getElementById(`boxImg${index}`).classList.remove("hidden");
-          }
-          
-          updatePreview();
+          imgElem.src = evt.target.result;
+          imgElem.classList.remove('hidden');
+          if (placeholder) placeholder.classList.add('hidden');
         };
         reader.readAsDataURL(file);
-      }
-    }
-
-    // UPDATE LIVE PREVIEW (START BLANK INITIALLY)
-    function updatePreview() {
-      document.getElementById("prevTajuk").innerText = document.getElementById("tajukProgram").value || "[ Tajuk Program ]";
-      document.getElementById("prevTarikh").innerText = document.getElementById("tarikhPelaksanaan").value || "[ Tarikh ]";
-      document.getElementById("prevMasa").innerText = document.getElementById("masa").value || "[ Masa ]";
-      document.getElementById("prevSasaran").innerText = document.getElementById("sasaran").value || "[ Kumpulan Sasaran ]";
-      
-      const pelibatanVal = document.getElementById("pelibatan").value;
-      if (pelibatanVal) {
-        document.getElementById("prevPelibatan").innerText = pelibatanVal;
-        document.getElementById("prevPelibatanBox").classList.remove("hidden");
       } else {
-        document.getElementById("prevPelibatanBox").classList.add("hidden");
-      }
-
-      document.getElementById("prevObjektif").innerText = document.getElementById("objektif").value || "[ Objektif Program ]";
-      document.getElementById("prevKekuatan").innerText = document.getElementById("kekuatan").value || "[ Kekuatan Program ]";
-      document.getElementById("prevPenambahbaikan").innerText = document.getElementById("penambahbaikan").value || "[ Penambahbaikan & Cadangan ]";
-      document.getElementById("prevNama").innerText = document.getElementById("namaPegawai").value || "[ Nama Pegawai ]";
-      document.getElementById("prevJawatan").innerText = document.getElementById("jawatanPegawai").value || "[ Jawatan ]";
-      document.getElementById("prevTarikhLaporan").innerText = document.getElementById("tarikhLaporan").value || "[ Tarikh Laporan ]";
-
-      for(let i=2; i<=4; i++) {
-        const cap = document.getElementById(`kapsyen${i}`).value;
-        if (cap) document.getElementById(`prevCap${i}`).innerText = cap;
+        state.images[index] = null;
+        imgElem.src = '';
+        imgElem.classList.add('hidden');
+        if (placeholder) placeholder.classList.remove('hidden');
       }
     }
 
-    // SUBMIT FORM: JANA DIRECT BROWSER PDF (IDEA B) + UNLOCKED ON SUCCESS
+    // 7. SUBMIT FORM: JANA DIRECT BROWSER PDF DENGAN PEMERIKSAAN IMEJ
     async function submitForm(e) {
       e.preventDefault();
 
       // 1. BLUR & LOCK SCREEN
       const blurOverlay = document.getElementById("blurOverlay");
+      document.getElementById('overlayText').innerText = "Menjana PDF dan menyimpan laporan...";
       blurOverlay.classList.remove("hidden");
 
       try {
-        // 2. JANA PDF PIXEL-PERFECT SEGERA DARI PREVIEW TEMPLATE VIA HTML2PDF.JS
         const pdfElement = document.getElementById("pdfTemplate");
+
+        // 2. PASTI SEMUA IMEJ DALAM TEMPLATE SELESAI DILOAD/DECODE SEBELUM JANA PDF
+        const images = pdfElement.querySelectorAll("img");
+        const imagePromises = Array.from(images).map(img => {
+          if (!img.src || img.classList.contains("hidden")) return Promise.resolve();
+          if (img.complete) return img.decode ? img.decode().catch(() => {}) : Promise.resolve();
+          
+          return new Promise(resolve => {
+            img.onload = resolve;
+            img.onerror = resolve;
+          });
+        });
+
+        await Promise.all(imagePromises);
+        
+        // Jeda 300ms untuk beri ruang pelayar melukis semula (repaint) susun atur
+        await new Promise(r => setTimeout(r, 300));
+
+        // 3. TETAPAN HTML2PDF DENGAN SOKONGAN CORS & TAINT
         const opt = {
           margin:       [6, 6, 6, 6],
           filename:     'OPR_Document.pdf',
           image:        { type: 'jpeg', quality: 0.98 },
-          html2canvas:  { scale: 2, useCORS: true, logging: false },
+          html2canvas:  { 
+            scale: 2, 
+            useCORS: true, 
+            allowTaint: true,
+            logging: false 
+          },
           jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
 
         const pdfBase64 = await html2pdf().from(pdfElement).set(opt).outputPdf('datauristring');
 
-        // 3. HANTAR DATA & PDF BASE64 KE BACKEND SHEET / DRIVE
+        // 4. HANTAR DATA & PDF BASE64 KE BACKEND SHEET / DRIVE
         const payload = {
           action: "saveOpr",
           rowId: document.getElementById("rowId").value,
@@ -848,9 +583,7 @@
         const result = await res.json();
 
         if (result.status === "success") {
-          // NYAHAKTIFKAN SKRIN KABUR SEBELUM MODAL SUCCESS
           blurOverlay.classList.add("hidden");
-
           alert(result.message);
           
           resetOprForm();
@@ -867,63 +600,97 @@
       }
     }
 
-    function renderPegawaiGrid() {
-      const grid = document.getElementById("pegawaiGrid");
-      if (state.pegawai.length === 0) {
-        grid.innerHTML = `<p class="col-span-3 text-slate-400 text-xs">Tiada data pegawai.</p>`;
-        return;
-      }
+    // 8. EDIT REKOD OPR
+    function editOpr(index) {
+      const item = state.allData[index];
+      if (!item) return;
 
-      grid.innerHTML = state.pegawai.map(p => {
-        const oprs = state.respon.filter(r => r.namaPegawai === p.nama);
-        return `
-          <div onclick="openHistoryModal('${p.nama}')" class="p-5 bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-md transition cursor-pointer flex items-start space-x-4">
-            <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-800 flex items-center justify-center font-bold text-lg">
-              ${p.nama.charAt(0)}
-            </div>
-            <div class="flex-1 min-w-0">
-              <h4 class="font-bold text-slate-900 text-sm truncate">${p.nama}</h4>
-              <p class="text-xs text-slate-500 truncate">${p.jawatan}</p>
-              <div class="mt-3 flex items-center justify-between text-xs">
-                <span class="font-bold text-slate-800 bg-slate-100 px-2.5 py-1 rounded-lg">${oprs.length} OPR Dihantar</span>
-                <span class="text-slate-400 hover:text-slate-800 font-bold">Lihat <i class="fa-solid fa-chevron-right text-[10px]"></i></span>
-              </div>
-            </div>
-          </div>
-        `;
-      }).join("");
+      document.getElementById('rowId').value = item.rowId || '';
+      document.getElementById('namaPegawai').value = item.namaPegawai || '';
+      document.getElementById('jawatanPegawai').value = item.jawatanPegawai || '';
+      document.getElementById('tarikhLaporan').value = item.tarikhLaporan || '';
+      document.getElementById('tajukProgram').value = item.tajukProgram || '';
+      document.getElementById('tarikhPelaksanaan').value = item.tarikhPelaksanaan || '';
+      document.getElementById('masa').value = item.masa || '';
+      document.getElementById('sasaran').value = item.sasaran || '';
+      document.getElementById('pelibatan').value = item.pelibatan || '';
+      document.getElementById('objektif').value = item.objektif || '';
+      document.getElementById('kekuatan').value = item.kekuatan || '';
+      document.getElementById('penambahbaikan').value = item.penambahbaikan || '';
+
+      document.getElementById('kapsyen1').value = item.kapsyen1 || '';
+      document.getElementById('kapsyen2').value = item.kapsyen2 || '';
+      document.getElementById('kapsyen3').value = item.kapsyen3 || '';
+      document.getElementById('kapsyen4').value = item.kapsyen4 || '';
+
+      // Set gambar sedia ada jika ada
+      [1, 2, 3, 4].forEach(i => {
+        const imgUrl = item[`gambar${i}`];
+        const imgElem = document.getElementById(`prevImg${i}`);
+        const placeholder = document.getElementById(`placeholder${i}`);
+
+        if (imgUrl) {
+          state.images[i] = imgUrl;
+          imgElem.src = imgUrl;
+          imgElem.classList.remove('hidden');
+          if (placeholder) placeholder.classList.add('hidden');
+        } else {
+          state.images[i] = null;
+          imgElem.src = '';
+          imgElem.classList.add('hidden');
+          if (placeholder) placeholder.classList.remove('hidden');
+        }
+      });
+
+      document.getElementById('formTitle').innerText = "Kemaskini Laporan OPR";
+      updatePreview();
+      switchTab('form');
     }
 
-    function openHistoryModal(namaPegawai) {
-      const p = state.pegawai.find(x => x.nama === namaPegawai);
-      const oprs = state.respon.filter(r => r.namaPegawai === namaPegawai);
+    // 9. PADAM REKOD OPR
+    async function deleteOpr(rowId) {
+      if (!confirm("Adakah anda pasti mahu memadam laporan ini? Action ini tidak boleh diundur.")) return;
 
-      document.getElementById("modalPegawaiName").innerText = namaPegawai;
-      document.getElementById("modalPegawaiJawatan").innerText = p ? p.jawatan : "";
+      document.getElementById('blurOverlay').classList.remove('hidden');
+      document.getElementById('overlayText').innerText = "Memadam rekod...";
 
-      const modalList = document.getElementById("modalOprList");
-      if (oprs.length === 0) {
-        modalList.innerHTML = `<p class="text-center text-slate-400 py-8 text-xs">Pegawai ini belum pernah menghantar OPR.</p>`;
-      } else {
-        modalList.innerHTML = oprs.map(r => `
-          <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between">
-            <div>
-              <h5 class="font-bold text-slate-800 text-xs">${r.tajukProgram}</h5>
-              <p class="text-[11px] text-slate-500 mt-0.5"><i class="fa-regular fa-calendar"></i> ${r.tarikhPelaksanaan} | ${r.masa}</p>
-            </div>
-            <a href="${r.pautanPdf}" target="_blank" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-bold transition flex items-center space-x-1 shadow-sm">
-              <i class="fa-solid fa-file-pdf"></i>
-              <span>Buka PDF</span>
-            </a>
-          </div>
-        `).join("");
+      try {
+        const res = await fetch(GAS_WEB_APP_URL, {
+          method: "POST",
+          body: JSON.stringify({ action: "deleteOpr", rowId: rowId })
+        });
+        const json = await res.json();
+
+        if (json.status === "success") {
+          alert("Laporan berjaya dipadam!");
+          await loadData(true);
+        } else {
+          alert("Gagal memadam: " + json.message);
+        }
+      } catch (err) {
+        alert("Ralat semasa memadam: " + err.toString());
+      } finally {
+        document.getElementById('blurOverlay').classList.add('hidden');
       }
-
-      document.getElementById("historyModal").classList.remove("hidden");
     }
 
-    function closeModal() {
-      document.getElementById("historyModal").classList.add("hidden");
+    // 10. RESET FORM
+    function resetOprForm() {
+      document.getElementById('oprForm').reset();
+      document.getElementById('rowId').value = '';
+      document.getElementById('formTitle').innerText = "Cipta Laporan OPR";
+      
+      state.images = { 1: null, 2: null, 3: null, 4: null };
+
+      [1, 2, 3, 4].forEach(i => {
+        const imgElem = document.getElementById(`prevImg${i}`);
+        const placeholder = document.getElementById(`placeholder${i}`);
+        imgElem.src = '';
+        imgElem.classList.add('hidden');
+        if (placeholder) placeholder.classList.remove('hidden');
+      });
+
+      updatePreview();
     }
   </script>
 </body>
