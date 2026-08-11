@@ -482,7 +482,7 @@
       document.getElementById('pvKapsyen4').innerText = document.getElementById('kapsyen4').value;
     }
 
-    // 6. HANDLE IMAGE UPLOAD & PREVIEW BASE64
+    // 6. HANDLE IMAGE UPLOAD & COMPRESSION BASE64
     function handleImageUpload(e, index) {
       const file = e.target.files[0];
       const imgElem = document.getElementById(`prevImg${index}`);
@@ -491,10 +491,44 @@
       if (file) {
         const reader = new FileReader();
         reader.onload = function(evt) {
-          state.images[index] = evt.target.result;
-          imgElem.src = evt.target.result;
-          imgElem.classList.remove('hidden');
-          if (placeholder) placeholder.classList.add('hidden');
+          const img = new Image();
+          img.onload = function() {
+            // Sediakan canvas untuk kompresi
+            const canvas = document.createElement("canvas");
+            const MAX_WIDTH = 1024; // Resolusi akan dikecilkan maksimum ke 1024px
+            const MAX_HEIGHT = 1024;
+            let width = img.width;
+            let height = img.height;
+
+            // Kira nisbah dimensi baru
+            if (width > height) {
+              if (width > MAX_WIDTH) {
+                height = Math.round((height *= MAX_WIDTH / width));
+                width = MAX_WIDTH;
+              }
+            } else {
+              if (height > MAX_HEIGHT) {
+                width = Math.round((width *= MAX_HEIGHT / height));
+                height = MAX_HEIGHT;
+              }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, width, height);
+
+            // Tukar kepada format JPEG dengan 70% kualiti
+            const compressedBase64 = canvas.toDataURL("image/jpeg", 0.7);
+
+            state.images[index] = compressedBase64;
+            imgElem.src = compressedBase64;
+            imgElem.classList.remove('hidden');
+            if (placeholder) placeholder.classList.add('hidden');
+            
+            updatePreview();
+          };
+          img.src = evt.target.result;
         };
         reader.readAsDataURL(file);
       } else {
