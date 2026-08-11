@@ -4,10 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>OPR PPDPU</title>
-  <!-- FAVICON JATA NEGARA -->
-  <link rel="icon" type="image/png" href="https://i.ibb.co/fYY58Rh2/JATA-NEGARA-PNG.png">
+  <link rel="icon" type="image/png" href="https://i.ibb.co/ycG5rppn/logo.png">
   
-  <!-- Tailwind CSS & FontAwesome Icons -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -28,16 +26,14 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-20">
         
-        <!-- LOGO JATA NEGARA & TAJUK -->
         <div class="flex items-center space-x-4">
-          <img src="https://i.ibb.co/fYY58Rh2/JATA-NEGARA-PNG.png" alt="Jata Negara" class="h-12 w-auto object-contain filter drop-shadow">
+          <img src="https://i.ibb.co/ycG5rppn/logo.png" alt="Logo PPD" class="h-12 w-auto object-contain filter drop-shadow">
           <div>
             <h1 class="text-xl font-extrabold tracking-tight">OPR Dashboard</h1>
             <p class="text-xs text-blue-200 font-medium">PPD Petaling Utama</p>
           </div>
         </div>
 
-        <!-- NAVIGATION TABS -->
         <nav class="flex space-x-2 bg-white/10 p-1.5 rounded-xl border border-white/10 backdrop-blur">
           <button onclick="switchTab('dashboard')" id="tab-dashboard" class="px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 bg-white text-blue-900 shadow">
             <i class="fa-solid fa-chart-pie mr-2"></i>Dashboard Data
@@ -56,7 +52,6 @@
   <!-- MAIN CONTAINER -->
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 custom-scrollbar">
 
-    <!-- ALERT SETTING URL -->
     <div id="configAlert" class="hidden mb-6 p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 flex items-center justify-between">
       <div class="flex items-center space-x-3">
         <i class="fa-solid fa-triangle-exclamation text-amber-600 text-xl"></i>
@@ -69,7 +64,6 @@
     <!-- ==================== TAB 1: DASHBOARD DATA ==================== -->
     <section id="sec-dashboard" class="space-y-6">
       
-      <!-- STATS CARDS -->
       <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
         <div class="glass-card p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between">
           <div>
@@ -112,7 +106,6 @@
         </div>
       </div>
 
-      <!-- FILTER & TABLE HEADER -->
       <div class="glass-card rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
         <div class="p-5 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-50/50">
           <div>
@@ -133,7 +126,6 @@
           </div>
         </div>
 
-        <!-- DYNAMIC LIVE TABLE -->
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
@@ -163,7 +155,7 @@
     <section id="sec-form" class="hidden space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
-        <!-- FORM SECTION -->
+        <!-- BORANG INPUT -->
         <div class="lg:col-span-7 glass-card p-6 rounded-2xl shadow-sm border border-slate-200/80 space-y-6">
           <div class="border-b border-slate-100 pb-4 flex items-center justify-between">
             <div>
@@ -171,7 +163,6 @@
               <p class="text-xs text-slate-500">Sila isi maklumat program di bawah dengan lengkap.</p>
             </div>
             
-            <!-- BUTTON RESET AT TOP RIGHT -->
             <button type="button" onclick="resetOprForm()" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold rounded-xl border border-rose-200 transition flex items-center space-x-1.5 shadow-sm">
               <i class="fa-solid fa-rotate-left"></i>
               <span>Reset Borang</span>
@@ -202,7 +193,6 @@
 
               <div>
                 <label class="block text-xs font-semibold text-slate-700 mb-1">Tarikh Laporan Disediakan *</label>
-                <!-- CALENDAR INPUT PICKER -->
                 <input type="date" id="tarikhLaporan" onchange="updatePreview()" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-blue-500 outline-none text-slate-700">
               </div>
             </div>
@@ -215,115 +205,129 @@
 
               <div>
                 <label class="block text-xs font-semibold text-slate-700 mb-1">Tajuk Program / Aktiviti *</label>
-                <input type="text" id="tajukProgram" oninput="updatePreview()" required placeholder="Cth: Bengkel Pemantapan Pengurusan Sekolah" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+                <input type="text" id="tajukProgram" oninput="updatePreview()" required placeholder="Cth: BENGKEL AI STEM UNTUK GKMP" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
               </div>
 
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label class="block text-xs font-semibold text-slate-700 mb-1">Tarikh Pelaksanaan *</label>
-                  <input type="text" id="tarikhPelaksanaan" oninput="updatePreview()" required placeholder="Cth: 10 Ogos 2026" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+                  <input type="text" id="tarikhPelaksanaan" oninput="updatePreview()" required placeholder="Cth: 11 OGOS 2026" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
                 </div>
                 <div>
                   <label class="block text-xs font-semibold text-slate-700 mb-1">Masa Pelaksanaan *</label>
-                  <input type="text" id="masa" oninput="updatePreview()" required placeholder="Cth: 8.00 pagi - 5.00 petang" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+                  <input type="text" id="masa" oninput="updatePreview()" required placeholder="Cth: 8.00 PAGI - 5.00 PETANG" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
                 </div>
               </div>
 
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label class="block text-xs font-semibold text-slate-700 mb-1">Kumpulan Sasaran *</label>
-                  <input type="text" id="sasaran" oninput="updatePreview()" required placeholder="Cth: 50 orang Guru Penolong Kanan" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+                  <input type="text" id="sasaran" oninput="updatePreview()" required placeholder="Cth: 70 GURU STEM" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
                 </div>
                 <div>
-                  <label class="block text-xs font-semibold text-slate-700 mb-1">Pelibatan Pihak Luar/Pegawai *</label>
-                  <input type="text" id="pelibatan" oninput="updatePreview()" required placeholder="Cth: Pegawai PPD, Pengetua, NGO" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+                  <label class="block text-xs font-semibold text-slate-700 mb-1">Pelibatan Pihak Luar (Pilihan / Tak Wajib)</label>
+                  <!-- TIDAK REQUIRED -->
+                  <input type="text" id="pelibatan" oninput="updatePreview()" placeholder="Cth: APPLE DAN GOOGLE" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
                 </div>
               </div>
             </div>
 
-            <!-- OBJEKTIF, KEKUATAN & PENAMBAHBAIKAN WITH AI & CLEAR BUTTONS -->
+            <!-- OBJEKTIF, KEKUATAN & PENAMBAHBAIKAN (DENGAN BUTANG 'X' DALAM BOX & AI) -->
             <div class="space-y-4">
               
-              <!-- OBJEKTIF PROGRAM -->
+              <!-- OBJEKTIF -->
               <div>
                 <div class="flex items-center justify-between mb-1">
                   <label class="text-xs font-semibold text-slate-700">🎯 Objektif Program *</label>
-                  <div class="flex items-center space-x-2">
-                    <button type="button" onclick="getAISuggestion('objektif')" class="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-[11px] font-bold rounded-lg border border-indigo-200 transition flex items-center space-x-1">
-                      <i class="fa-solid fa-wand-magic-sparkles"></i> <span>✨ AI Suggestion</span>
-                    </button>
-                    <button type="button" onclick="clearField('objektif')" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 text-[11px] font-bold rounded-lg transition">
-                      <i class="fa-solid fa-xmark"></i> Padam
-                    </button>
-                  </div>
+                  <button type="button" onclick="getAISuggestion('objektif')" class="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-[11px] font-bold rounded-lg border border-indigo-200 transition flex items-center space-x-1">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> <span>✨ AI Suggestion</span>
+                  </button>
                 </div>
-                <textarea id="objektif" oninput="updatePreview()" rows="3" required placeholder="1. ...&#10;2. ..." class="w-full bg-white border border-slate-200 rounded-xl p-3 text-xs focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+                <!-- RELATIVE CONTAINER FOR INSIDE 'X' BUTTON -->
+                <div class="relative">
+                  <textarea id="objektif" oninput="updatePreview()" rows="3" required placeholder="1. ...&#10;2. ..." class="w-full bg-white border border-slate-200 rounded-xl p-3 pr-8 text-xs focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+                  <button type="button" onclick="clearField('objektif')" title="Padam teks" class="absolute top-2 right-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 w-6 h-6 rounded-full flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                  </button>
+                </div>
               </div>
 
-              <!-- KEKUATAN PROGRAM -->
+              <!-- KEKUATAN -->
               <div>
                 <div class="flex items-center justify-between mb-1">
                   <label class="text-xs font-semibold text-slate-700">💪 Kekuatan Program *</label>
-                  <div class="flex items-center space-x-2">
-                    <button type="button" onclick="getAISuggestion('kekuatan')" class="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-[11px] font-bold rounded-lg border border-emerald-200 transition flex items-center space-x-1">
-                      <i class="fa-solid fa-wand-magic-sparkles"></i> <span>✨ AI Suggestion</span>
-                    </button>
-                    <button type="button" onclick="clearField('kekuatan')" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 text-[11px] font-bold rounded-lg transition">
-                      <i class="fa-solid fa-xmark"></i> Padam
-                    </button>
-                  </div>
+                  <button type="button" onclick="getAISuggestion('kekuatan')" class="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-[11px] font-bold rounded-lg border border-emerald-200 transition flex items-center space-x-1">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> <span>✨ AI Suggestion</span>
+                  </button>
                 </div>
-                <textarea id="kekuatan" oninput="updatePreview()" rows="3" required placeholder="● ..." class="w-full bg-white border border-slate-200 rounded-xl p-3 text-xs focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+                <div class="relative">
+                  <textarea id="kekuatan" oninput="updatePreview()" rows="3" required placeholder="● ..." class="w-full bg-white border border-slate-200 rounded-xl p-3 pr-8 text-xs focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+                  <button type="button" onclick="clearField('kekuatan')" title="Padam teks" class="absolute top-2 right-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 w-6 h-6 rounded-full flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                  </button>
+                </div>
               </div>
 
-              <!-- PENAMBAHBAIKAN & CADANGAN -->
+              <!-- PENAMBAHBAIKAN -->
               <div>
                 <div class="flex items-center justify-between mb-1">
                   <label class="text-xs font-semibold text-slate-700">📈 Penambahbaikan & Cadangan *</label>
-                  <div class="flex items-center space-x-2">
-                    <button type="button" onclick="getAISuggestion('penambahbaikan')" class="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 text-[11px] font-bold rounded-lg border border-amber-200 transition flex items-center space-x-1">
-                      <i class="fa-solid fa-wand-magic-sparkles"></i> <span>✨ AI Suggestion</span>
-                    </button>
-                    <button type="button" onclick="clearField('penambahbaikan')" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 text-[11px] font-bold rounded-lg transition">
-                      <i class="fa-solid fa-xmark"></i> Padam
-                    </button>
-                  </div>
+                  <button type="button" onclick="getAISuggestion('penambahbaikan')" class="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 text-[11px] font-bold rounded-lg border border-amber-200 transition flex items-center space-x-1">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> <span>✨ AI Suggestion</span>
+                  </button>
                 </div>
-                <textarea id="penambahbaikan" oninput="updatePreview()" rows="3" required placeholder="● ..." class="w-full bg-white border border-slate-200 rounded-xl p-3 text-xs focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+                <div class="relative">
+                  <textarea id="penambahbaikan" oninput="updatePreview()" rows="3" required placeholder="● ..." class="w-full bg-white border border-slate-200 rounded-xl p-3 pr-8 text-xs focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+                  <button type="button" onclick="clearField('penambahbaikan')" title="Padam teks" class="absolute top-2 right-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 w-6 h-6 rounded-full flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                  </button>
+                </div>
               </div>
 
             </div>
 
-            <!-- GAMBAR & KAPSYEN -->
+            <!-- GAMBAR & KAPSYEN WITH PERINGATAN LANDSCAPE -->
             <div class="space-y-3">
               <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 flex items-center space-x-2">
                 <i class="fa-solid fa-images"></i> <span>Lampiran Bergambar (4 Gambar)</span>
               </h3>
 
-              <div class="grid grid-cols-2 gap-3">
-                <div class="p-3 border border-slate-200 rounded-xl bg-slate-50/50 space-y-2">
-                  <p class="text-[11px] font-bold text-slate-700">Gambar 1</p>
-                  <input type="file" accept="image/*" onchange="handleImageUpload(event, 1)" class="text-[11px] text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-[11px] file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200">
-                  <input type="text" id="kapsyen1" oninput="updatePreview()" placeholder="Kapsyen Gambar 1" class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-[11px] outline-none">
+              <!-- GAMBAR 1 (HERO IMAGE UTAMA) -->
+              <div class="p-3.5 border-2 border-dashed border-blue-200 rounded-xl bg-blue-50/40 space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-extrabold text-blue-900">Gambar 1 (Hero / Gambar Utama Background)</span>
+                  <span class="text-[10px] bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded">
+                    <i class="fa-solid fa-camera mr-1"></i> Disyorkan Melintang (Landscape)
+                  </span>
                 </div>
+                <input type="file" accept="image/*" onchange="handleImageUpload(event, 1)" class="text-[11px] text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-[11px] file:bg-blue-600 file:text-white hover:file:bg-blue-700">
+                <input type="text" id="kapsyen1" oninput="updatePreview()" placeholder="Kapsyen Gambar Utama (Pilihan)" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1 text-xs outline-none">
+              </div>
 
+              <!-- GAMBAR 2, 3, 4 -->
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                
                 <div class="p-3 border border-slate-200 rounded-xl bg-slate-50/50 space-y-2">
-                  <p class="text-[11px] font-bold text-slate-700">Gambar 2</p>
-                  <input type="file" accept="image/*" onchange="handleImageUpload(event, 2)" class="text-[11px] text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-[11px] file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200">
+                  <div class="flex items-center justify-between">
+                    <span class="text-[11px] font-bold text-slate-700">Gambar 2</span>
+                  </div>
+                  <p class="text-[9px] text-amber-600 font-medium"><i class="fa-solid fa-circle-info mr-1"></i>Disyorkan Melintang</p>
+                  <input type="file" accept="image/*" onchange="handleImageUpload(event, 2)" class="text-[10px] text-slate-500 file:mr-1 file:py-0.5 file:px-1.5 file:rounded file:border-0 file:text-[10px] file:bg-slate-200 file:text-slate-700">
                   <input type="text" id="kapsyen2" oninput="updatePreview()" placeholder="Kapsyen Gambar 2" class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-[11px] outline-none">
                 </div>
 
                 <div class="p-3 border border-slate-200 rounded-xl bg-slate-50/50 space-y-2">
-                  <p class="text-[11px] font-bold text-slate-700">Gambar 3</p>
-                  <input type="file" accept="image/*" onchange="handleImageUpload(event, 3)" class="text-[11px] text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-[11px] file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200">
+                  <span class="text-[11px] font-bold text-slate-700 block">Gambar 3</span>
+                  <input type="file" accept="image/*" onchange="handleImageUpload(event, 3)" class="text-[10px] text-slate-500 file:mr-1 file:py-0.5 file:px-1.5 file:rounded file:border-0 file:text-[10px] file:bg-slate-200 file:text-slate-700">
                   <input type="text" id="kapsyen3" oninput="updatePreview()" placeholder="Kapsyen Gambar 3" class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-[11px] outline-none">
                 </div>
 
                 <div class="p-3 border border-slate-200 rounded-xl bg-slate-50/50 space-y-2">
-                  <p class="text-[11px] font-bold text-slate-700">Gambar 4</p>
-                  <input type="file" accept="image/*" onchange="handleImageUpload(event, 4)" class="text-[11px] text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-[11px] file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200">
+                  <span class="text-[11px] font-bold text-slate-700 block">Gambar 4</span>
+                  <input type="file" accept="image/*" onchange="handleImageUpload(event, 4)" class="text-[10px] text-slate-500 file:mr-1 file:py-0.5 file:px-1.5 file:rounded file:border-0 file:text-[10px] file:bg-slate-200 file:text-slate-700">
                   <input type="text" id="kapsyen4" oninput="updatePreview()" placeholder="Kapsyen Gambar 4" class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-[11px] outline-none">
                 </div>
+
               </div>
             </div>
 
@@ -335,7 +339,7 @@
           </form>
         </div>
 
-        <!-- LIVE PREVIEW SECTION (MODEN KAD INFOGRAFIK) -->
+        <!-- LIVE PREVIEW SECTION (MODEN INFOGRAFIK KORPORAT) -->
         <div class="lg:col-span-5 space-y-4">
           <div class="sticky top-28 space-y-4">
             <div class="flex items-center justify-between">
@@ -345,63 +349,96 @@
               <span class="text-[10px] bg-emerald-100 text-emerald-700 font-bold px-2 py-0.5 rounded-full">Pratonton PDF</span>
             </div>
 
-            <!-- PREVIEW CONTAINER MODEN -->
+            <!-- CONTAINER PREVIEW PDF EXACT MATCH -->
             <div class="bg-white border border-slate-200 shadow-xl rounded-2xl p-5 text-[10px] text-slate-800 space-y-3 font-sans leading-relaxed">
               
-              <!-- BANNER HEADER -->
-              <div class="bg-gradient-to-r from-slate-900 via-blue-900 to-blue-800 text-white p-3 rounded-xl flex items-center space-x-3">
-                <img src="https://i.ibb.co/fYY58Rh2/JATA-NEGARA-PNG.png" class="h-8 w-auto">
-                <div>
-                  <h4 class="font-extrabold text-[10px] uppercase tracking-tight">LAPORAN RINGKAS PROGRAM / AKTIVITI (ONE PAGE REPORT)</h4>
-                  <p class="text-[8px] text-blue-200">PEJABAT PENDIDIKAN DAERAH PETALING UTAMA</p>
+              <!-- HEADER BANNER DENGAN LOGO PPD & SLOGAN -->
+              <div class="bg-gradient-to-r from-slate-900 via-blue-900 to-blue-800 text-white p-3 rounded-xl flex items-center space-x-3 shadow-md">
+                <img src="https://i.ibb.co/ycG5rppn/logo.png" class="h-10 w-auto object-contain">
+                <div class="flex-1 text-center">
+                  <h4 class="font-extrabold text-[9.5px] uppercase tracking-tight">
+                    LAPORAN RINGKAS PROGRAM / AKTIVITI <span class="whitespace-nowrap">(ONE PAGE REPORT)</span>
+                  </h4>
+                  <p class="text-[8px] text-blue-200 font-semibold uppercase">PEJABAT PENDIDIKAN DAERAH PETALING UTAMA</p>
+                  <p class="text-[7.5px] text-slate-200 italic font-normal mt-0.5">"PENDIDIKAN BERMUTU, INSAN TERDIDIK, NEGARA SEJAHTERA"</p>
                 </div>
               </div>
 
-              <!-- INFO MAKLUMAT -->
-              <div class="bg-slate-50 border border-slate-200 rounded-xl p-2.5">
-                <table class="w-full border-collapse text-[9px]">
-                  <tr class="border-b border-slate-200/60"><td class="w-1/3 p-1 font-bold text-slate-600">Tajuk Program</td><td id="prevTajuk" class="p-1 font-extrabold text-blue-900">[ Tajuk Program ]</td></tr>
-                  <tr class="border-b border-slate-200/60"><td class="p-1 font-bold text-slate-600">Tarikh Pelaksanaan</td><td id="prevTarikh" class="p-1">[ Tarikh Pelaksanaan ]</td></tr>
-                  <tr class="border-b border-slate-200/60"><td class="p-1 font-bold text-slate-600">Masa</td><td id="prevMasa" class="p-1">[ Masa ]</td></tr>
-                  <tr class="border-b border-slate-200/60"><td class="p-1 font-bold text-slate-600">Sasaran</td><td id="prevSasaran" class="p-1">[ Sasaran ]</td></tr>
-                  <tr><td class="p-1 font-bold text-slate-600">Pelibatan</td><td id="prevPelibatan" class="p-1">[ Pelibatan ]</td></tr>
-                </table>
+              <!-- HERO IMAGE DENGAN OVERLAY TAJUK PROGRAM -->
+              <div id="prevHeroBox" class="relative w-full h-40 bg-slate-900 rounded-xl overflow-hidden shadow-inner flex items-end">
+                <img id="prevImg1" class="absolute inset-0 w-full h-full object-cover hidden">
+                <div class="relative z-10 w-full bg-gradient-to-t from-slate-950 via-slate-950/80 to-transparent p-3 text-white">
+                  <h2 id="prevTajuk" class="text-sm font-extrabold uppercase tracking-wide leading-tight drop-shadow">
+                    BENGKEL AI STEM UNTUK GKMP
+                  </h2>
+                </div>
+              </div>
+
+              <!-- HIGH IMPACT INFO (NO BORING LABELS) -->
+              <div class="bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-center space-y-0.5">
+                <div class="text-[9.5px] font-extrabold text-slate-700 uppercase">
+                  📅 <span id="prevTarikh">11 OGOS 2026</span> &nbsp;&nbsp;|&nbsp;&nbsp; ⏰ <span id="prevMasa">8.00 PAGI - 5.00 PETANG</span>
+                </div>
+                <div class="text-[10px] font-extrabold text-blue-900 uppercase">
+                  🎯 <span id="prevSasaran">70 GURU STEM</span> TERLIBAT
+                </div>
+                <div id="prevPelibatanBox" class="text-[8.5px] font-bold text-sky-600 uppercase">
+                  🤝 DENGAN KERJASAMA: <span id="prevPelibatan">APPLE DAN GOOGLE</span>
+                </div>
               </div>
 
               <!-- KAD OBJEKTIF -->
-              <div class="border rounded-xl p-2.5 bg-sky-50/70 border-sky-200">
+              <div class="border rounded-xl p-2.5 bg-sky-50/80 border-sky-200">
                 <p class="font-extrabold text-sky-800 text-[9.5px]">🎯 OBJEKTIF PROGRAM</p>
-                <p id="prevObjektif" class="whitespace-pre-wrap text-slate-700 mt-1">[ Objektif ]</p>
+                <p id="prevObjektif" class="whitespace-pre-wrap text-slate-700 mt-1">[ Objektif Program ]</p>
               </div>
 
               <!-- KAD KEKUATAN -->
-              <div class="border rounded-xl p-2.5 bg-emerald-50/70 border-emerald-200">
+              <div class="border rounded-xl p-2.5 bg-emerald-50/80 border-emerald-200">
                 <p class="font-extrabold text-emerald-800 text-[9.5px]">💪 KEKUATAN</p>
-                <p id="prevKekuatan" class="whitespace-pre-wrap text-slate-700 mt-1">[ Kekuatan ]</p>
+                <p id="prevKekuatan" class="whitespace-pre-wrap text-slate-700 mt-1">[ Kekuatan Program ]</p>
               </div>
 
               <!-- KAD PENAMBAHBAIKAN -->
-              <div class="border rounded-xl p-2.5 bg-amber-50/70 border-amber-200">
+              <div class="border rounded-xl p-2.5 bg-amber-50/80 border-amber-200">
                 <p class="font-extrabold text-amber-800 text-[9.5px]">📈 PENAMBAHBAIKAN & CADANGAN</p>
-                <p id="prevPenambahbaikan" class="whitespace-pre-wrap text-slate-700 mt-1">[ Penambahbaikan ]</p>
+                <p id="prevPenambahbaikan" class="whitespace-pre-wrap text-slate-700 mt-1">[ Penambahbaikan & Cadangan ]</p>
               </div>
 
-              <!-- GAMBAR GRID -->
-              <div class="border rounded-xl p-2.5 bg-white border-slate-200">
-                <p class="font-bold text-blue-900 mb-1.5 text-[9px]">📸 LAMPIRAN BERGAMBAR</p>
+              <!-- GAMBAR GRID 2, 3, 4 -->
+              <div id="prevGalleryBox" class="border rounded-xl p-2 bg-white border-slate-200 space-y-2">
+                <p class="font-bold text-blue-900 text-[8.5px]">📸 LAMPIRAN BERGAMBAR</p>
+                
+                <!-- GAMBAR 2 (TOP FULL WIDTH) -->
+                <div id="boxImg2" class="border rounded-lg p-1 text-center bg-slate-50 hidden">
+                  <img id="prevImg2" class="h-24 w-full object-cover rounded">
+                  <span id="prevCap2" class="text-[8px] text-slate-500 italic block mt-0.5">Gambar 2</span>
+                </div>
+
+                <!-- GAMBAR 3 & 4 (BOTTOM HALF GRID) -->
                 <div class="grid grid-cols-2 gap-2">
-                  <div class="border rounded-lg p-1 text-center bg-slate-50"><img id="prevImg1" class="h-16 w-full object-cover rounded hidden"><span id="prevCap1" class="text-[8px] text-slate-400 italic block">Gambar 1</span></div>
-                  <div class="border rounded-lg p-1 text-center bg-slate-50"><img id="prevImg2" class="h-16 w-full object-cover rounded hidden"><span id="prevCap2" class="text-[8px] text-slate-400 italic block">Gambar 2</span></div>
-                  <div class="border rounded-lg p-1 text-center bg-slate-50"><img id="prevImg3" class="h-16 w-full object-cover rounded hidden"><span id="prevCap3" class="text-[8px] text-slate-400 italic block">Gambar 3</span></div>
-                  <div class="border rounded-lg p-1 text-center bg-slate-50"><img id="prevImg4" class="h-16 w-full object-cover rounded hidden"><span id="prevCap4" class="text-[8px] text-slate-400 italic block">Gambar 4</span></div>
+                  <div id="boxImg3" class="border rounded-lg p-1 text-center bg-slate-50 hidden">
+                    <img id="prevImg3" class="h-20 w-full object-cover rounded">
+                    <span id="prevCap3" class="text-[8px] text-slate-500 italic block mt-0.5">Gambar 3</span>
+                  </div>
+                  <div id="boxImg4" class="border rounded-lg p-1 text-center bg-slate-50 hidden">
+                    <img id="prevImg4" class="h-20 w-full object-cover rounded">
+                    <span id="prevCap4" class="text-[8px] text-slate-500 italic block mt-0.5">Gambar 4</span>
+                  </div>
                 </div>
               </div>
 
               <!-- FOOTER PREVIEW -->
-              <div class="pt-2 text-[8.5px] border-t border-slate-200 text-slate-600">
-                <p><strong>Disediakan oleh:</strong> <span id="prevNama">[ Nama Pegawai ]</span> (<span id="prevJawatan">[ Jawatan ]</span>)</p>
-                <p><strong>Tarikh Laporan:</strong> <span id="prevTarikhLaporan">[ Tarikh Laporan ]</span></p>
+              <div class="pt-2 text-[8.5px] border-t border-slate-200 text-slate-600 flex justify-between items-end">
+                <div>
+                  <p><strong>Disediakan oleh:</strong> <span id="prevNama">[ Nama Pegawai ]</span> (<span id="prevJawatan">[ Jawatan ]</span>)</p>
+                  <p><strong>Tarikh Laporan:</strong> <span id="prevTarikhLaporan">[ Tarikh Laporan ]</span></p>
+                </div>
+                <div class="text-right text-[7.5px] text-slate-400">
+                  OPR Web App PPDPU
+                </div>
               </div>
+
             </div>
           </div>
         </div>
@@ -438,10 +475,9 @@
     </div>
   </div>
 
-  <!-- JAVASCRIPT LOGIC -->
   <script>
     // MASUKKAN URL GOOGLE APPS SCRIPT WEB APP ANDA
-    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxTCPvhjxVgBW6TbOU-cOgW3xObdZSf1Yqn6YDfrPQRVg1BaRTQ_8IceUxrH69a7KoJag/exec";
+    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz0YCbEF69CYx1ypm2isg5qJ7wrW4yyfuN1oKN38c5_PLG7B0q-fl63hcMmMWdicWLM/exec";
 
     let state = {
       pegawai: [],
@@ -454,14 +490,12 @@
         document.getElementById("configAlert").classList.remove("hidden");
       }
       
-      // Set tarikh laporan kepada hari ini secara default
       const today = new Date().toISOString().split('T')[0];
       document.getElementById("tarikhLaporan").value = today;
 
       loadData();
     });
 
-    // SWITCH TAB
     function switchTab(tab) {
       document.getElementById("sec-dashboard").classList.add("hidden");
       document.getElementById("sec-form").classList.add("hidden");
@@ -476,7 +510,6 @@
       activeBtn.className = "px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 bg-white text-blue-900 shadow";
     }
 
-    // LOAD DATA
     async function loadData(isRefresh = false) {
       const refreshSpinner = document.getElementById("refreshSpinner");
       if (isRefresh) refreshSpinner.classList.add("fa-spin");
@@ -501,7 +534,6 @@
       }
     }
 
-    // RENDER STATS
     function renderStats() {
       document.getElementById("statTotalOpr").innerText = state.respon.length;
       document.getElementById("statTotalPegawai").innerText = state.pegawai.length;
@@ -514,7 +546,6 @@
       document.getElementById("statDrivePdf").innerText = pdfCount;
     }
 
-    // RENDER TABLE
     function renderTable(data) {
       const tbody = document.getElementById("oprTableBody");
       if (data.length === 0) {
@@ -543,7 +574,6 @@
       `).join("");
     }
 
-    // FILTER TABLE
     function filterTable() {
       const q = document.getElementById("searchInput").value.toLowerCase();
       const filtered = state.respon.filter(r => 
@@ -553,7 +583,6 @@
       renderTable(filtered);
     }
 
-    // PEGAWAI DROPDOWN
     function populatePegawaiDropdown() {
       const select = document.getElementById("namaPegawai");
       select.innerHTML = '<option value="">-- Pilih Pegawai --</option>' + 
@@ -569,7 +598,6 @@
       updatePreview();
     }
 
-    // AI SUGGESTION GENERATOR
     async function getAISuggestion(fieldType) {
       const tajuk = document.getElementById("tajukProgram").value;
       const sasaran = document.getElementById("sasaran").value;
@@ -611,69 +639,78 @@
       }
     }
 
-    // PADAM TEKS (CLEAR FIELD)
+    // PADAM TEKS (CLEAR FIELD) VIA BUTTON X
     function clearField(fieldId) {
       document.getElementById(fieldId).value = "";
       updatePreview();
     }
 
-    // RESET FORM UTAMA
     function resetOprForm() {
       if (confirm("Adakah anda pasti untuk mengosongkan keseluruhan borang?")) {
         document.getElementById("oprForm").reset();
         state.images = { 1: null, 2: null, 3: null, 4: null };
         
-        // Hide preview images
-        for(let i=1; i<=4; i++) {
-          const img = document.getElementById(`prevImg${i}`);
-          img.src = "";
-          img.classList.add("hidden");
-          document.getElementById(`prevCap${i}`).innerText = `Gambar ${i}`;
-        }
-        
+        document.getElementById("prevImg1").classList.add("hidden");
+        document.getElementById("boxImg2").classList.add("hidden");
+        document.getElementById("boxImg3").classList.add("hidden");
+        document.getElementById("boxImg4").classList.add("hidden");
+
         const today = new Date().toISOString().split('T')[0];
         document.getElementById("tarikhLaporan").value = today;
         updatePreview();
       }
     }
 
-    // IMAGE UPLOAD HANDLER
     function handleImageUpload(e, index) {
       const file = e.target.files[0];
       if (file) {
         const reader = new FileReader();
         reader.onload = function(evt) {
           state.images[index] = evt.target.result;
-          const imgEl = document.getElementById(`prevImg${index}`);
-          imgEl.src = evt.target.result;
-          imgEl.classList.remove("hidden");
+          
+          if (index === 1) {
+            const imgEl = document.getElementById("prevImg1");
+            imgEl.src = evt.target.result;
+            imgEl.classList.remove("hidden");
+          } else {
+            const imgEl = document.getElementById(`prevImg${index}`);
+            imgEl.src = evt.target.result;
+            document.getElementById(`boxImg${index}`).classList.remove("hidden");
+          }
+          
           updatePreview();
         };
         reader.readAsDataURL(file);
       }
     }
 
-    // LIVE PREVIEW UPDATE
     function updatePreview() {
-      document.getElementById("prevTajuk").innerText = document.getElementById("tajukProgram").value || "[ Tajuk Program ]";
-      document.getElementById("prevTarikh").innerText = document.getElementById("tarikhPelaksanaan").value || "[ Tarikh Pelaksanaan ]";
-      document.getElementById("prevMasa").innerText = document.getElementById("masa").value || "[ Masa ]";
-      document.getElementById("prevSasaran").innerText = document.getElementById("sasaran").value || "[ Sasaran ]";
-      document.getElementById("prevPelibatan").innerText = document.getElementById("pelibatan").value || "[ Pelibatan ]";
-      document.getElementById("prevObjektif").innerText = document.getElementById("objektif").value || "[ Objektif ]";
-      document.getElementById("prevKekuatan").innerText = document.getElementById("kekuatan").value || "[ Kekuatan ]";
-      document.getElementById("prevPenambahbaikan").innerText = document.getElementById("penambahbaikan").value || "[ Penambahbaikan ]";
+      document.getElementById("prevTajuk").innerText = document.getElementById("tajukProgram").value || "BENGKEL AI STEM UNTUK GKMP";
+      document.getElementById("prevTarikh").innerText = document.getElementById("tarikhPelaksanaan").value || "11 OGOS 2026";
+      document.getElementById("prevMasa").innerText = document.getElementById("masa").value || "8.00 PAGI - 5.00 PETANG";
+      document.getElementById("prevSasaran").innerText = document.getElementById("sasaran").value || "70 GURU STEM";
+      
+      const pelibatanVal = document.getElementById("pelibatan").value;
+      if (pelibatanVal) {
+        document.getElementById("prevPelibatan").innerText = pelibatanVal;
+        document.getElementById("prevPelibatanBox").classList.remove("hidden");
+      } else {
+        document.getElementById("prevPelibatanBox").classList.add("hidden");
+      }
+
+      document.getElementById("prevObjektif").innerText = document.getElementById("objektif").value || "[ Objektif Program ]";
+      document.getElementById("prevKekuatan").innerText = document.getElementById("kekuatan").value || "[ Kekuatan Program ]";
+      document.getElementById("prevPenambahbaikan").innerText = document.getElementById("penambahbaikan").value || "[ Penambahbaikan & Cadangan ]";
       document.getElementById("prevNama").innerText = document.getElementById("namaPegawai").value || "[ Nama Pegawai ]";
       document.getElementById("prevJawatan").innerText = document.getElementById("jawatanPegawai").value || "[ Jawatan ]";
       document.getElementById("prevTarikhLaporan").innerText = document.getElementById("tarikhLaporan").value || "[ Tarikh Laporan ]";
 
-      for(let i=1; i<=4; i++) {
+      for(let i=2; i<=4; i++) {
         const cap = document.getElementById(`kapsyen${i}`).value;
         if (cap) document.getElementById(`prevCap${i}`).innerText = cap;
       }
     }
 
-    // SUBMIT FORM
     async function submitForm(e) {
       e.preventDefault();
       const submitBtn = document.getElementById("submitBtn");
@@ -726,7 +763,6 @@
       }
     }
 
-    // ARKIB PEGAWAI
     function renderPegawaiGrid() {
       const grid = document.getElementById("pegawaiGrid");
       if (state.pegawai.length === 0) {
@@ -754,7 +790,6 @@
       }).join("");
     }
 
-    // MODAL
     function openHistoryModal(namaPegawai) {
       const p = state.pegawai.find(x => x.nama === namaPegawai);
       const oprs = state.respon.filter(r => r.namaPegawai === namaPegawai);
