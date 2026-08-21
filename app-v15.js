@@ -43,20 +43,21 @@ async function loadData(isRefresh = false) {
   const refreshSpinner = document.getElementById("refreshSpinner");
   const selectedOfficer = document.getElementById("namaPegawai")?.value || "";
   if (isRefresh && refreshSpinner) refreshSpinner.classList.add("fa-spin");
+  if (!isRefresh) {
+    try {
+      const cached = JSON.parse(localStorage.getItem("oprInitialDataV15") || "null");
+      if (cached && cached.status === "success") applyInitialData(cached, selectedOfficer);
+    } catch (cacheError) {
+      localStorage.removeItem("oprInitialDataV15");
+    }
+  }
   try {
     const response = await fetch(`${getApiUrl()}?action=getInitialData`, { cache: "no-store" });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const result = await response.json();
     if (result.status !== "success") throw new Error(result.message || "Data tidak dapat dimuatkan");
-    state.pegawai = result.pegawai || [];
-    state.respon = result.respon || [];
-    renderStats();
-    renderTable(state.respon);
-    populatePegawaiDropdown();
-    if (selectedOfficer && state.pegawai.some(person => person.nama === selectedOfficer)) {
-      document.getElementById("namaPegawai").value = selectedOfficer;
-    }
-    renderPegawaiGrid();
+    localStorage.setItem("oprInitialDataV15", JSON.stringify(result));
+    applyInitialData(result, selectedOfficer);
   } catch (err) {
     console.error("Gagal tarik data:", err);
     const tbody = document.getElementById("oprTableBody");
@@ -64,6 +65,18 @@ async function loadData(isRefresh = false) {
   } finally {
     if (isRefresh && refreshSpinner) refreshSpinner.classList.remove("fa-spin");
   }
+}
+
+function applyInitialData(result, selectedOfficer = "") {
+  state.pegawai = result.pegawai || [];
+  state.respon = result.respon || [];
+  renderStats();
+  renderTable(state.respon);
+  populatePegawaiDropdown();
+  if (selectedOfficer && state.pegawai.some(person => person.nama === selectedOfficer)) {
+    document.getElementById("namaPegawai").value = selectedOfficer;
+  }
+  renderPegawaiGrid();
 }
 
 function renderStats() {
