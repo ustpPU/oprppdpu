@@ -214,9 +214,6 @@ function resetOprForm() {
   if (!confirm("Adakah anda pasti untuk mengosongkan borang?")) return;
   document.getElementById("oprForm").reset();
   document.getElementById("editRowId").value = "";
-  document.getElementById("editIc").value = "";
-  document.getElementById("editIc").required = false;
-  document.getElementById("editAuthBox").classList.add("hidden");
   state.images = createImageState();
   for (let index = 1; index <= 4; index++) {
     document.getElementById(`fileImg${index}`).value = "";
@@ -273,9 +270,6 @@ async function loadOprForEdit(summary) {
       document.getElementById(`editImgBtn${index}`).classList.toggle("hidden", !imageData);
     }
 
-    document.getElementById("editAuthBox").classList.remove("hidden");
-    document.getElementById("editIc").required = true;
-    document.getElementById("editIc").value = "";
     updatePreview();
   } finally {
     submitBtn.disabled = false;
@@ -400,12 +394,6 @@ function downloadBlob(blob, fileName) {
 async function handleSaveAndPrint(event) {
   event.preventDefault();
   const editRowId = document.getElementById("editRowId").value || "";
-  const editIc = document.getElementById("editIc").value.replace(/\D/g, "");
-  if (editRowId && editIc.length !== 12) {
-    alert("Untuk mengedit laporan, sila masukkan 12 digit nombor IC tanpa sempang.");
-    document.getElementById("editIc").focus();
-    return;
-  }
 
   const submitBtn = document.getElementById("submitBtn");
   submitBtn.disabled = true;
@@ -431,7 +419,6 @@ async function handleSaveAndPrint(event) {
     const payload = {
       action: "saveReport",
       editRowId,
-      editIc,
       namaPegawai: officer,
       jawatanPegawai: document.getElementById("jawatanPegawai").value,
       tarikhLaporan: date,

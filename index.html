@@ -248,11 +248,6 @@
                 <input type="date" id="tarikhLaporan" onchange="updatePreview()" required class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs outline-none">
               </div>
 
-              <div id="editAuthBox" class="hidden rounded-xl border border-amber-200 bg-amber-50 p-3">
-                <label class="block text-xs font-bold text-amber-900 mb-1">Pengesahan Edit — No. IC tanpa sempang *</label>
-                <input type="password" id="editIc" inputmode="numeric" autocomplete="off" maxlength="12" placeholder="Contoh: 900101101234" class="w-full bg-white border border-amber-300 rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-amber-400">
-                <p class="mt-1 text-[10px] text-amber-700">IC hanya dihantar ketika kemas kini dan tidak dipaparkan dalam dashboard.</p>
-              </div>
             </div>
 
             <div class="space-y-3">
@@ -408,7 +403,7 @@
               </div>
 
               <!-- HERO IMAGE -->
-              <div id="prevHeroBox" class="relative w-full aspect-[16/9] max-h-40 bg-slate-900 rounded-lg overflow-hidden flex items-end page-break-avoid border border-slate-800">
+              <div id="prevHeroBox" class="relative w-full h-44 bg-slate-900 rounded-lg overflow-hidden flex items-end page-break-avoid border border-slate-800">
                 <img id="prevImg1" class="absolute inset-0 w-full h-full object-cover object-[center_75%] hidden">
                 <div class="relative z-10 w-full bg-gradient-to-t from-slate-950 via-slate-950/70 to-transparent p-2.5 text-white">
                   <h2 id="prevTajuk" class="text-xs sm:text-sm font-extrabold uppercase tracking-wide leading-tight text-white"></h2>
@@ -449,17 +444,17 @@
                 
                 <div class="grid grid-cols-3 gap-2">
                   <div id="boxImg2" class="border border-slate-200 rounded p-1 text-center bg-slate-50 hidden">
-                    <img id="prevImg2" class="h-24 w-full object-cover object-top rounded">
+                    <img id="prevImg2" class="h-28 w-full object-cover object-top rounded">
                     <span id="prevCap2" class="text-[7pt] text-slate-600 italic block mt-0.5 font-medium truncate"></span>
                   </div>
 
                   <div id="boxImg3" class="border border-slate-200 rounded p-1 text-center bg-slate-50 hidden">
-                    <img id="prevImg3" class="h-24 w-full object-cover object-top rounded">
+                    <img id="prevImg3" class="h-28 w-full object-cover object-top rounded">
                     <span id="prevCap3" class="text-[7pt] text-slate-600 italic block mt-0.5 font-medium truncate"></span>
                   </div>
 
                   <div id="boxImg4" class="border border-slate-200 rounded p-1 text-center bg-slate-50 hidden">
-                    <img id="prevImg4" class="h-24 w-full object-cover object-top rounded">
+                    <img id="prevImg4" class="h-28 w-full object-cover object-top rounded">
                     <span id="prevCap4" class="text-[7pt] text-slate-600 italic block mt-0.5 font-medium truncate"></span>
                   </div>
                 </div>
@@ -996,6 +991,6 @@
       document.getElementById("historyModal").classList.add("hidden");
     }
   </script>
-  <script src="app-v15.js?v=16"></script>
+  <script src="app-v15.js?v=17"></script>
 </body>
 </html>
