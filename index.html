@@ -42,6 +42,13 @@
       border-radius: 0 !important;
       box-shadow: none !important;
     }
+    #printContent {
+      transform-origin: top center;
+    }
+    #prevImg1 {
+      object-fit: cover !important;
+      object-position: center center !important;
+    }
     .progress-step[data-status="active"] .step-icon {
       border-color: #0f172a;
       color: #0f172a;
@@ -401,13 +408,15 @@
 
             <!-- CONTAINER PRATONTON STRICT 1 PAGE A4 -->
             <div id="previewShell">
-            <div id="printArea" class="bg-white border border-slate-300 shadow-lg rounded-2xl p-4 text-slate-900 space-y-2 text-[8.5pt] font-sans leading-tight print:border-none print:shadow-none print:rounded-none print:p-0">
+            <p id="reportFitNotice" class="hidden mb-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] font-semibold text-amber-800">Kandungan terlalu panjang untuk satu halaman A4. Sila ringkaskan isi laporan sebelum menjana PDF.</p>
+            <div id="printArea" class="bg-white border border-slate-300 shadow-lg rounded-2xl p-4 text-slate-900 text-[8.5pt] font-sans leading-tight print:border-none print:shadow-none print:rounded-none print:p-0">
+              <div id="printContent" class="space-y-2">
               
               <!-- HEADER TERKEMAS -->
-              <div class="grid grid-cols-[165px_1fr_165px] items-center pb-2 border-b border-slate-300 page-break-avoid">
-                <img src="assets/logo-ppdpu.png" class="h-[66px] w-[160px] max-w-full object-contain object-center justify-self-start" alt="Logo Kementerian Pendidikan Malaysia dan PPD Petaling Utama">
+              <div class="grid grid-cols-[140px_1fr_140px] items-center pb-2 border-b border-slate-300 page-break-avoid">
+                <img src="assets/logo-ppdpu.png" class="h-[60px] w-[140px] max-w-full object-contain object-center justify-self-start" alt="Logo Kementerian Pendidikan Malaysia dan PPD Petaling Utama">
                 <div class="text-center">
-                  <h4 class="font-extrabold text-[10pt] uppercase tracking-wide text-slate-900 leading-tight">
+                  <h4 class="whitespace-nowrap font-extrabold text-[8.7pt] uppercase tracking-normal text-slate-900 leading-tight">
                     LAPORAN RINGKAS PROGRAM / AKTIVITI (ONE PAGE REPORT)
                   </h4>
                   <p class="text-[8pt] text-slate-700 font-bold uppercase mt-0.5">PEJABAT PENDIDIKAN DAERAH PETALING UTAMA</p>
@@ -485,6 +494,7 @@
                 </div>
               </div>
 
+              </div>
             </div>
             </div>
           </div>
@@ -1157,6 +1167,6 @@
       document.getElementById("historyModal").classList.add("hidden");
     }
   </script>
-  <script src="app-v15.js?v=18"></script>
+  <script src="app-v15.js?v=19"></script>
 </body>
 </html>
