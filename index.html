@@ -286,8 +286,8 @@
               <div>
                 <div class="flex items-center justify-between mb-1">
                   <label class="text-xs font-semibold text-slate-700">🎯 Objektif Program *</label>
-                  <button type="button" onclick="getAISuggestion('objektif')" class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold rounded border border-slate-300">
-                    <i class="fa-solid fa-wand-magic-sparkles mr-1"></i>AI Suggestion
+                  <button type="button" onclick="getAISuggestion('objektif')" class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold rounded border border-slate-300" title="Jana cadangan baharu">
+                    <i class="fa-solid fa-wand-magic-sparkles mr-1"></i>Cadangan
                   </button>
                 </div>
                 <div class="relative">
@@ -301,8 +301,8 @@
               <div>
                 <div class="flex items-center justify-between mb-1">
                   <label class="text-xs font-semibold text-slate-700">💪 Kekuatan Program *</label>
-                  <button type="button" onclick="getAISuggestion('kekuatan')" class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold rounded border border-slate-300">
-                    <i class="fa-solid fa-wand-magic-sparkles mr-1"></i>AI Suggestion
+                  <button type="button" onclick="getAISuggestion('kekuatan')" class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold rounded border border-slate-300" title="Jana cadangan baharu">
+                    <i class="fa-solid fa-wand-magic-sparkles mr-1"></i>Cadangan
                   </button>
                 </div>
                 <div class="relative">
@@ -316,8 +316,8 @@
               <div>
                 <div class="flex items-center justify-between mb-1">
                   <label class="text-xs font-semibold text-slate-700">📈 Penambahbaikan & Cadangan *</label>
-                  <button type="button" onclick="getAISuggestion('penambahbaikan')" class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold rounded border border-slate-300">
-                    <i class="fa-solid fa-wand-magic-sparkles mr-1"></i>AI Suggestion
+                  <button type="button" onclick="getAISuggestion('penambahbaikan')" class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold rounded border border-slate-300" title="Jana cadangan baharu">
+                    <i class="fa-solid fa-wand-magic-sparkles mr-1"></i>Cadangan
                   </button>
                 </div>
                 <div class="relative">
@@ -800,10 +800,88 @@
       }
     }
 
-    async function getAISuggestion(fieldType) {
+    const suggestionStocks = {
+      objektif: [
+        "Meningkatkan kefahaman {sasaran} berkaitan pengisian dan pelaksanaan {tajuk}.",
+        "Memperkukuh pengetahuan serta kemahiran {sasaran} melalui pendedahan yang terancang.",
+        "Menyediakan ruang pembelajaran aktif untuk {sasaran} berkongsi pengalaman dan amalan terbaik.",
+        "Meningkatkan keupayaan {sasaran} mengaplikasikan input program dalam tugas dan tindakan susulan.",
+        "Menyelaras hala tuju pelaksanaan antara {sasaran} agar selari dengan keperluan semasa.",
+        "Membina keyakinan {sasaran} untuk melaksanakan inisiatif yang diperoleh secara lebih berkesan.",
+        "Memantapkan kompetensi profesional {sasaran} menerusi perkongsian input yang relevan.",
+        "Menggalakkan budaya pembelajaran berterusan dalam kalangan {sasaran}.",
+        "Memperluas jaringan kerjasama dan perkongsian idea dalam kalangan {sasaran}.",
+        "Memberi pendedahan kepada {sasaran} terhadap pendekatan, strategi dan amalan semasa.",
+        "Meningkatkan kesedaran {sasaran} terhadap peranan masing-masing dalam menjayakan program.",
+        "Memudah cara {sasaran} mengenal pasti langkah praktikal yang boleh dilaksanakan selepas program.",
+        "Memperkasa {sasaran} untuk membuat perancangan dan keputusan yang lebih berfokus.",
+        "Mewujudkan kefahaman bersama dalam kalangan {sasaran} terhadap matlamat {tajuk}.",
+        "Mengukuhkan penguasaan {sasaran} terhadap kaedah pelaksanaan yang sistematik dan berimpak.",
+        "Merangsang idea baharu serta inovasi dalam kalangan {sasaran} melalui sesi interaktif.",
+        "Meningkatkan kesediaan {sasaran} untuk menghadapi cabaran pelaksanaan di peringkat masing-masing.",
+        "Membudayakan amalan refleksi dan penambahbaikan berterusan dalam kalangan {sasaran}.",
+        "Memastikan {sasaran} mendapat maklumat yang tepat, jelas dan boleh dilaksanakan.",
+        "Menggalakkan kolaborasi yang lebih erat antara {sasaran} dan pihak berkaitan."
+      ],
+      kekuatan: [
+        "Komitmen dan penglibatan aktif {sasaran} sepanjang pelaksanaan program.",
+        "Pengisian program yang jelas, tersusun dan menepati keperluan {sasaran}.",
+        "Kerjasama baik antara urus setia, penceramah dan peserta telah melancarkan perjalanan program.",
+        "Penyampaian yang interaktif berjaya menarik perhatian serta menggalakkan penglibatan peserta.",
+        "Pengurusan masa program berjalan dengan teratur mengikut tentatif yang ditetapkan.",
+        "Maklum balas peserta menunjukkan penerimaan yang baik terhadap pengisian program.",
+        "Penceramah berjaya menyampaikan input secara berfokus, jelas dan mudah difahami.",
+        "Bahan pembentangan dan aktiviti yang disediakan menyokong pemahaman peserta dengan baik.",
+        "Suasana pembelajaran yang positif mendorong peserta untuk bertanya dan berkongsi pandangan.",
+        "Penglibatan pihak berkaitan membantu memperkukuh kelancaran pelaksanaan program.",
+        "Sesi perkongsian pengalaman memberi nilai tambah kepada {sasaran}.",
+        "Aktiviti yang dilaksanakan bersesuaian dengan objektif dan hasil yang disasarkan.",
+        "Urus setia memberi respons yang cekap terhadap keperluan peserta sepanjang program.",
+        "Penggunaan kaedah pelaksanaan yang pelbagai menjadikan program lebih menarik dan berkesan.",
+        "Peserta menunjukkan kesediaan untuk mengaplikasikan input yang diperoleh dalam tugas masing-masing.",
+        "Komunikasi yang baik antara semua pihak membantu mengelakkan sebarang gangguan pelaksanaan.",
+        "Sokongan pengurusan dan pihak kerjasama menyumbang kepada kejayaan program.",
+        "Dokumentasi serta penyelarasan awal yang baik memudahkan urusan pelaksanaan.",
+        "Sesi soal jawab memberi peluang kepada peserta mendapatkan penjelasan secara langsung.",
+        "Objektif program dapat disampaikan dengan jelas melalui pengisian yang relevan dan praktikal."
+      ],
+      penambahbaikan: [
+        "Memanjangkan tempoh sesi praktikal supaya peserta mempunyai lebih ruang untuk mengaplikasikan input.",
+        "Menyediakan bahan rujukan awal agar peserta dapat membuat persediaan sebelum program berlangsung.",
+        "Memperbanyak aktiviti kumpulan bagi menggalakkan penglibatan dan perkongsian idea peserta.",
+        "Menyediakan sesi susulan untuk memantau pelaksanaan input program di peringkat masing-masing.",
+        "Menambah masa bagi sesi soal jawab untuk membolehkan isu peserta ditangani dengan lebih menyeluruh.",
+        "Memperluas hebahan awal supaya penyertaan daripada kumpulan sasaran dapat ditingkatkan.",
+        "Menyediakan contoh amalan terbaik yang lebih pelbagai dan dekat dengan situasi sebenar peserta.",
+        "Menggunakan borang maklum balas yang lebih terperinci untuk menilai keberkesanan program.",
+        "Memastikan bahan pembentangan dikongsi selepas program sebagai rujukan peserta.",
+        "Memperkemas pengurusan masa setiap slot agar semua pengisian dapat disampaikan dengan optimum.",
+        "Menyusun aktiviti mengikut tahap keperluan peserta supaya pengisian lebih bersasar.",
+        "Mewujudkan kumpulan sokongan atau saluran komunikasi bagi tindakan susulan selepas program.",
+        "Menambah elemen demonstrasi dan latihan amali untuk mengukuhkan kefahaman peserta.",
+        "Mendapatkan keperluan awal peserta melalui tinjauan ringkas sebelum menetapkan pengisian.",
+        "Memperluas penglibatan rakan strategik bagi menambah nilai kepada pelaksanaan program.",
+        "Menyediakan panduan tindakan ringkas supaya peserta dapat melaksanakan susulan dengan lebih yakin.",
+        "Mengadakan sesi perkongsian susulan bagi menilai cabaran dan kejayaan pelaksanaan.",
+        "Memastikan kemudahan teknikal diuji lebih awal untuk mengelakkan gangguan semasa program.",
+        "Menambah variasi kaedah penyampaian bagi mengekalkan fokus dan minat peserta.",
+        "Merekod dapatan dan cadangan peserta untuk penambahbaikan penganjuran pada masa hadapan."
+      ]
+    };
+
+    function pickSuggestions(fieldType, tajuk, sasaran) {
+      const stock = suggestionStocks[fieldType] || [];
+      const selected = [...stock].sort(() => Math.random() - 0.5).slice(0, 3);
+      const target = sasaran || "peserta";
+      return selected.map((text, index) => {
+        const sentence = text.replaceAll("{tajuk}", tajuk || "program ini").replaceAll("{sasaran}", target);
+        return fieldType === "objektif" ? `${index + 1}. ${sentence}` : `● ${sentence}`;
+      }).join("\n");
+    }
+
+    function getAISuggestion(fieldType) {
       const tajuk = document.getElementById("tajukProgram").value;
       const sasaran = document.getElementById("sasaran").value;
-      const pelibatan = document.getElementById("pelibatan").value;
 
       if (!tajuk) {
         alert("Sila isi 'Tajuk Program' terlebih dahulu.");
@@ -812,31 +890,8 @@
       }
 
       const targetField = document.getElementById(fieldType);
-      const originalText = targetField.value;
-      targetField.value = "🤖 Menjana cadangan AI...";
-
-      try {
-        const response = await fetch(GAS_WEB_APP_URL, {
-          method: "POST",
-          body: JSON.stringify({
-            action: "generateAI",
-            fieldType: fieldType,
-            tajukProgram: tajuk,
-            sasaran: sasaran,
-            pelibatan: pelibatan
-          })
-        });
-
-        const result = await response.json();
-        if (result.status === "success" && result.text) {
-          targetField.value = result.text;
-          updatePreview();
-        } else {
-          targetField.value = originalText;
-        }
-      } catch (err) {
-        targetField.value = originalText;
-      }
+      targetField.value = pickSuggestions(fieldType, tajuk, sasaran);
+      updatePreview();
     }
 
     function triggerPrint() {
