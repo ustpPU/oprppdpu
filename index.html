@@ -304,7 +304,7 @@
                   </button>
                 </div>
                 <div class="relative">
-                  <textarea id="objektif" oninput="updatePreview()" onkeydown="handleStructuredEnter(event, 'objektif')" rows="3" required placeholder="1. ...&#10;2. ..." class="w-full bg-white border border-slate-300 rounded-xl p-2.5 pr-8 text-xs outline-none"></textarea>
+                  <textarea id="objektif" oninput="handleStructuredInput(this, 'objektif')" onkeydown="handleStructuredEnter(event, 'objektif')" rows="3" required placeholder="1. ...&#10;2. ..." class="w-full bg-white border border-slate-300 rounded-xl p-2.5 pr-8 text-xs outline-none"></textarea>
                   <button type="button" onclick="clearField('objektif')" class="absolute top-2 right-2 text-slate-400 hover:text-slate-700 w-5 h-5 flex items-center justify-center">
                     <i class="fa-solid fa-xmark text-xs"></i>
                   </button>
@@ -319,7 +319,7 @@
                   </button>
                 </div>
                 <div class="relative">
-                  <textarea id="kekuatan" oninput="updatePreview()" onkeydown="handleStructuredEnter(event, 'bullet')" rows="3" required placeholder="● ..." class="w-full bg-white border border-slate-300 rounded-xl p-2.5 pr-8 text-xs outline-none"></textarea>
+                  <textarea id="kekuatan" oninput="handleStructuredInput(this, 'bullet')" onkeydown="handleStructuredEnter(event, 'bullet')" rows="3" required placeholder="● ..." class="w-full bg-white border border-slate-300 rounded-xl p-2.5 pr-8 text-xs outline-none"></textarea>
                   <button type="button" onclick="clearField('kekuatan')" class="absolute top-2 right-2 text-slate-400 hover:text-slate-700 w-5 h-5 flex items-center justify-center">
                     <i class="fa-solid fa-xmark text-xs"></i>
                   </button>
@@ -334,7 +334,7 @@
                   </button>
                 </div>
                 <div class="relative">
-                  <textarea id="penambahbaikan" oninput="updatePreview()" onkeydown="handleStructuredEnter(event, 'bullet')" rows="3" required placeholder="● ..." class="w-full bg-white border border-slate-300 rounded-xl p-2.5 pr-8 text-xs outline-none"></textarea>
+                  <textarea id="penambahbaikan" oninput="handleStructuredInput(this, 'bullet')" onkeydown="handleStructuredEnter(event, 'bullet')" rows="3" required placeholder="● ..." class="w-full bg-white border border-slate-300 rounded-xl p-2.5 pr-8 text-xs outline-none"></textarea>
                   <button type="button" onclick="clearField('penambahbaikan')" class="absolute top-2 right-2 text-slate-400 hover:text-slate-700 w-5 h-5 flex items-center justify-center">
                     <i class="fa-solid fa-xmark text-xs"></i>
                   </button>
@@ -404,15 +404,16 @@
             <div id="printArea" class="bg-white border border-slate-300 shadow-lg rounded-2xl p-4 text-slate-900 space-y-2 text-[8.5pt] font-sans leading-tight print:border-none print:shadow-none print:rounded-none print:p-0">
               
               <!-- HEADER TERKEMAS -->
-              <div class="flex items-center space-x-2 pb-2 border-b border-slate-300 page-break-avoid">
-                <img src="https://i.ibb.co/ycG5rppn/logo.png" class="h-[68px] w-[175px] max-w-none object-contain object-left shrink-0" alt="Logo PPD">
-                <div class="flex-1 text-center pr-1">
+              <div class="grid grid-cols-[165px_1fr_165px] items-center pb-2 border-b border-slate-300 page-break-avoid">
+                <img src="assets/logo-ppdpu.png" class="h-[66px] w-[160px] max-w-full object-contain object-center justify-self-start" alt="Logo Kementerian Pendidikan Malaysia dan PPD Petaling Utama">
+                <div class="text-center">
                   <h4 class="font-extrabold text-[10pt] uppercase tracking-wide text-slate-900 leading-tight">
                     LAPORAN RINGKAS PROGRAM / AKTIVITI (ONE PAGE REPORT)
                   </h4>
                   <p class="text-[8pt] text-slate-700 font-bold uppercase mt-0.5">PEJABAT PENDIDIKAN DAERAH PETALING UTAMA</p>
                   <p class="text-[7pt] text-slate-500 italic mt-0.5 font-normal">"PENDIDIKAN BERMUTU, INSAN TERDIDIK, NEGARA SEJAHTERA"</p>
                 </div>
+                <div aria-hidden="true"></div>
               </div>
 
               <!-- HERO IMAGE -->
@@ -843,10 +844,32 @@
       updatePreview();
     }
 
+    function structuredPrefix(type) {
+      return type === "objektif" ? "1. " : "● ";
+    }
+
+    function handleStructuredInput(field, type) {
+      // Melindungi input tampal atau teks yang ditaip selepas medan dikosongkan.
+      if (field.value && !field.value.trimStart().match(type === "objektif" ? /^\d+\.\s*/ : /^[●•\-*]\s*/)) {
+        const cursor = field.selectionStart;
+        const prefix = structuredPrefix(type);
+        field.value = prefix + field.value.trimStart();
+        field.setSelectionRange(cursor + prefix.length, cursor + prefix.length);
+      }
+      updatePreview();
+    }
+
     function handleStructuredEnter(event, type) {
+      const field = event.target;
+      // Letakkan penanda sebelum aksara pertama ditaip, bukan selepas Enter.
+      if (event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey && !event.isComposing && !field.value.trim()) {
+        const prefix = structuredPrefix(type);
+        field.value = prefix;
+        field.setSelectionRange(prefix.length, prefix.length);
+      }
+
       if (event.key !== "Enter" || event.shiftKey || event.isComposing) return;
       event.preventDefault();
-      const field = event.target;
       const start = field.selectionStart;
       const currentLine = field.value.slice(0, start).split("\n").pop();
       let nextPrefix;
