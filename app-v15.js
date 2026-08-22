@@ -2,10 +2,10 @@
 
 function createImageState() {
   return {
-    1: { dataUrl: "", existingRef: "", changed: false, sourceUrl: "" },
-    2: { dataUrl: "", existingRef: "", changed: false, sourceUrl: "" },
-    3: { dataUrl: "", existingRef: "", changed: false, sourceUrl: "" },
-    4: { dataUrl: "", existingRef: "", changed: false, sourceUrl: "" }
+    1: { dataUrl: "", existingRef: "", changed: false, sourceUrl: "", originalSource: "" },
+    2: { dataUrl: "", existingRef: "", changed: false, sourceUrl: "", originalSource: "" },
+    3: { dataUrl: "", existingRef: "", changed: false, sourceUrl: "", originalSource: "" },
+    4: { dataUrl: "", existingRef: "", changed: false, sourceUrl: "", originalSource: "" }
   };
 }
 
@@ -107,12 +107,14 @@ function processAndUploadImage(event, index) {
   const imageState = state.images[index];
   if (imageState.sourceUrl && imageState.sourceUrl.startsWith("blob:")) URL.revokeObjectURL(imageState.sourceUrl);
   imageState.sourceUrl = URL.createObjectURL(file);
+  imageState.originalSource = imageState.sourceUrl;
   openImageEditor(index, imageState.sourceUrl);
 }
 
 function openImageEditor(index, sourceOverride = "") {
   const imageState = state.images[index];
-  const source = sourceOverride || imageState.dataUrl || imageState.sourceUrl;
+  // Sentiasa buka daripada fail asal supaya Reset benar-benar kembali ke gambar asal.
+  const source = sourceOverride || imageState.originalSource || imageState.sourceUrl || imageState.dataUrl;
   if (!source) return;
   activeImageIndex = index;
   const modal = document.getElementById("imageEditorModal");
@@ -131,7 +133,11 @@ function openImageEditor(index, sourceOverride = "") {
     guides: true,
     center: true,
     movable: true,
-    zoomable: true,
+    zoomable: false,
+    zoomOnWheel: false,
+    zoomOnTouch: false,
+    cropBoxMovable: false,
+    cropBoxResizable: false,
     scalable: false,
     rotatable: false,
     toggleDragModeOnDblclick: false
@@ -147,10 +153,6 @@ function closeImageEditor() {
     cropperInstance = null;
   }
   activeImageIndex = null;
-}
-
-function cropZoom(amount) {
-  if (cropperInstance) cropperInstance.zoom(amount);
 }
 
 function cropReset() {
@@ -207,7 +209,27 @@ function updatePreview() {
     if (imageData) hasGallery = true;
   }
   document.getElementById("prevGalleryBox").classList.toggle("hidden", !hasGallery);
-  requestAnimationFrame(fitPreview);
+  requestAnimationFrame(() => {
+    fitHeroForSinglePage();
+    fitPreview();
+  });
+}
+
+function fitHeroForSinglePage() {
+  const area = document.getElementById("printArea");
+  const hero = document.getElementById("prevHeroBox");
+  if (!area || !hero) return;
+
+  // Mulakan dengan 16:9. Jika kandungan terlalu panjang, kecilkan hero sahaja
+  // supaya keseluruhan laporan kekal satu halaman A4.
+  hero.style.height = "";
+  hero.style.aspectRatio = "16 / 9";
+  const overflow = area.scrollHeight - area.clientHeight;
+  if (overflow > 0) {
+    const reducedHeight = Math.max(150, Math.round(hero.offsetHeight - overflow - 8));
+    hero.style.aspectRatio = "auto";
+    hero.style.height = `${reducedHeight}px`;
+  }
 }
 
 function resetOprForm() {
@@ -264,7 +286,8 @@ async function loadOprForEdit(summary) {
         dataUrl: imageData,
         existingRef: data[`gambarRef${index}`] || "",
         changed: false,
-        sourceUrl: ""
+        sourceUrl: "",
+        originalSource: imageData
       };
       document.getElementById(`fileImg${index}`).value = "";
       document.getElementById(`editImgBtn${index}`).classList.toggle("hidden", !imageData);
@@ -335,6 +358,8 @@ function waitForPreviewImages() {
 
 async function generatePdfBlob() {
   const area = document.getElementById("printArea");
+  fitHeroForSinglePage();
+  await new Promise(resolve => requestAnimationFrame(resolve));
   await document.fonts.ready;
   await waitForPreviewImages();
   const oldTransform = area.style.transform;
