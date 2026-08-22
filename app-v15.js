@@ -31,12 +31,14 @@ document.addEventListener("DOMContentLoaded", () => {
 function fitPreview() {
   const shell = document.getElementById("previewShell");
   const area = document.getElementById("printArea");
+  const notice = document.getElementById("reportFitNotice");
   if (!shell || !area || area.classList.contains("pdf-capture")) return;
   area.style.transform = "none";
   const naturalWidth = area.offsetWidth || 794;
   const scale = Math.min(1, shell.clientWidth / naturalWidth);
   area.style.transform = `scale(${scale})`;
-  shell.style.height = `${area.offsetHeight * scale}px`;
+  const noticeHeight = notice && !notice.classList.contains("hidden") ? notice.offsetHeight + 8 : 0;
+  shell.style.height = `${noticeHeight + area.offsetHeight * scale}px`;
 }
 
 async function loadData(isRefresh = false) {
@@ -210,7 +212,7 @@ function updatePreview() {
   }
   document.getElementById("prevGalleryBox").classList.toggle("hidden", !hasGallery);
   requestAnimationFrame(() => {
-    fitHeroForSinglePage();
+    fitReportToSinglePage();
     fitPreview();
   });
 }
@@ -220,8 +222,8 @@ function fitHeroForSinglePage() {
   const hero = document.getElementById("prevHeroBox");
   if (!area || !hero) return;
 
-  // Mulakan dengan 16:9. Jika kandungan terlalu panjang, kecilkan hero sahaja
-  // supaya keseluruhan laporan kekal satu halaman A4.
+  // Hero kekal menggunakan object-fit: cover; perubahan tinggi hanya crop
+  // bahagian gambar, tidak pernah menarik atau menyekkan nisbah asalnya.
   hero.style.height = "";
   hero.style.aspectRatio = "16 / 9";
   const overflow = area.scrollHeight - area.clientHeight;
@@ -230,6 +232,38 @@ function fitHeroForSinglePage() {
     hero.style.aspectRatio = "auto";
     hero.style.height = `${reducedHeight}px`;
   }
+}
+
+function fitReportToSinglePage() {
+  const area = document.getElementById("printArea");
+  const content = document.getElementById("printContent");
+  const notice = document.getElementById("reportFitNotice");
+  if (!area || !content) return { scale: 1, tooLong: false };
+
+  content.style.transform = "none";
+  content.style.width = "100%";
+  fitHeroForSinglePage();
+
+  const requiredScale = Math.min(1, (area.clientHeight - 1) / content.scrollHeight);
+  const minimumReadableScale = 0.76;
+  const scale = Math.max(minimumReadableScale, requiredScale);
+  const tooLong = requiredScale < minimumReadableScale;
+
+  // Lebarkan susun atur sebelum diskalakan supaya lebar laporan kekal sama;
+  // semua elemen mengecil sekata dan tiada gambar 2–4 ditolak keluar halaman.
+  content.style.width = `${100 / scale}%`;
+  content.style.transform = `scale(${scale})`;
+  if (notice) notice.classList.toggle("hidden", !tooLong);
+  return { scale, tooLong };
+}
+
+function triggerPrint() {
+  const fit = fitReportToSinglePage();
+  if (fit.tooLong) {
+    alert("Laporan terlalu panjang untuk satu halaman A4. Sila ringkaskan isi laporan sebelum mencetak.");
+    return;
+  }
+  window.print();
 }
 
 function resetOprForm() {
@@ -356,9 +390,40 @@ function waitForPreviewImages() {
   }));
 }
 
+function addSelectableTextLayer(pdf, area) {
+  const areaRect = area.getBoundingClientRect();
+  const xScale = 210 / areaRect.width;
+  const yScale = 297 / areaRect.height;
+  const walker = document.createTreeWalker(area, NodeFilter.SHOW_TEXT);
+  const textNodes = [];
+  let node;
+  while ((node = walker.nextNode())) textNodes.push(node);
+
+  // Lapisan ini dilukis dahulu dan dilindungi oleh imej PDF di atasnya.
+  // Jadi rupa PDF kekal sama, tetapi teksnya boleh dicari dan disalin.
+  pdf.setFont("helvetica", "normal");
+  pdf.setTextColor(255, 255, 255);
+  textNodes.forEach(textNode => {
+    const parent = textNode.parentElement;
+    const text = String(textNode.nodeValue || "").replace(/\s+/g, " ").trim().replace(/[\u{1F000}-\u{1FAFF}]/gu, "");
+    if (!parent || !text || parent.closest("script, style, [aria-hidden='true']")) return;
+    const range = document.createRange();
+    range.selectNodeContents(textNode);
+    const rect = range.getBoundingClientRect();
+    if (!rect.width || !rect.height || rect.bottom < areaRect.top || rect.top > areaRect.bottom) return;
+    const fontSize = Math.max(2.2, parseFloat(getComputedStyle(parent).fontSize || "8") * yScale);
+    const x = Math.max(0, (rect.left - areaRect.left) * xScale);
+    const y = Math.max(fontSize, (rect.top - areaRect.top) * yScale + fontSize);
+    const maxWidth = Math.max(4, rect.width * xScale);
+    pdf.setFontSize(fontSize);
+    pdf.text(pdf.splitTextToSize(text, maxWidth), x, y, { lineHeightFactor: 1.15 });
+  });
+}
+
 async function generatePdfBlob() {
   const area = document.getElementById("printArea");
-  fitHeroForSinglePage();
+  const fit = fitReportToSinglePage();
+  if (fit.tooLong) throw new Error("Laporan terlalu panjang untuk satu halaman A4. Sila ringkaskan isi laporan.");
   await new Promise(resolve => requestAnimationFrame(resolve));
   await document.fonts.ready;
   await waitForPreviewImages();
@@ -379,6 +444,7 @@ async function generatePdfBlob() {
     });
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4", compress: true });
+    addSelectableTextLayer(pdf, area);
     pdf.addImage(canvas.toDataURL("image/jpeg", 0.92), "JPEG", 0, 0, 210, 297, undefined, "FAST");
     return pdf.output("blob");
   } finally {
