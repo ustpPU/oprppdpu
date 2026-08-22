@@ -285,7 +285,7 @@
             <div class="space-y-3">
               <div>
                 <div class="flex items-center justify-between mb-1">
-                  <label class="text-xs font-semibold text-slate-700">🎯 Objektif Program *</label>
+                  <label class="text-xs font-semibold text-slate-700">Objektif Program *</label>
                   <button type="button" onclick="getAISuggestion('objektif')" class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold rounded border border-slate-300" title="Jana cadangan baharu">
                     <i class="fa-solid fa-wand-magic-sparkles mr-1"></i>Cadangan
                   </button>
@@ -300,7 +300,7 @@
 
               <div>
                 <div class="flex items-center justify-between mb-1">
-                  <label class="text-xs font-semibold text-slate-700">💪 Kekuatan Program *</label>
+                  <label class="text-xs font-semibold text-slate-700">Kekuatan Program *</label>
                   <button type="button" onclick="getAISuggestion('kekuatan')" class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold rounded border border-slate-300" title="Jana cadangan baharu">
                     <i class="fa-solid fa-wand-magic-sparkles mr-1"></i>Cadangan
                   </button>
@@ -315,7 +315,7 @@
 
               <div>
                 <div class="flex items-center justify-between mb-1">
-                  <label class="text-xs font-semibold text-slate-700">📈 Penambahbaikan & Cadangan *</label>
+                  <label class="text-xs font-semibold text-slate-700">Penambahbaikan & Cadangan *</label>
                   <button type="button" onclick="getAISuggestion('penambahbaikan')" class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold rounded border border-slate-300" title="Jana cadangan baharu">
                     <i class="fa-solid fa-wand-magic-sparkles mr-1"></i>Cadangan
                   </button>
@@ -403,38 +403,38 @@
               </div>
 
               <!-- HERO IMAGE -->
-              <div id="prevHeroBox" class="relative w-full h-44 bg-slate-900 rounded-lg overflow-hidden flex items-end page-break-avoid border border-slate-800">
+              <div id="prevHeroBox" class="relative w-full h-52 bg-slate-900 rounded-lg overflow-hidden flex items-end page-break-avoid border border-slate-800">
                 <img id="prevImg1" class="absolute inset-0 w-full h-full object-cover object-[center_75%] hidden">
                 <div class="relative z-10 w-full bg-gradient-to-t from-slate-950 via-slate-950/70 to-transparent p-2.5 text-white">
                   <h2 id="prevTajuk" class="text-xs sm:text-sm font-extrabold uppercase tracking-wide leading-tight text-white"></h2>
                 </div>
               </div>
 
-              <!-- INFO BAR DENGAN KERJASAMA -->
-              <div class="border border-slate-300 rounded-md py-1 px-2 text-center bg-slate-50 page-break-avoid text-[7.5pt]">
-                <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-0.5 font-bold text-slate-800 uppercase">
-                  <span>📅 <span id="prevTarikh"></span></span>
-                  <span>⏰ <span id="prevMasa"></span></span>
-                  <span>🎯 SASARAN: <span id="prevSasaran"></span></span>
-                  <span id="prevPelibatanBox" class="hidden">🤝 DENGAN KERJASAMA: <span id="prevPelibatan"></span></span>
+              <!-- MAKLUMAT PROGRAM -->
+              <div class="border border-slate-300 rounded-md bg-slate-50 page-break-avoid text-[7.5pt]">
+                <div class="flex flex-wrap items-stretch justify-center divide-x divide-slate-300 text-slate-800">
+                  <div class="px-3 py-1 text-center"><span class="block text-[5.5pt] font-extrabold tracking-[0.12em] text-slate-500">TARIKH</span><span id="prevTarikh" class="font-bold"></span></div>
+                  <div class="px-3 py-1 text-center"><span class="block text-[5.5pt] font-extrabold tracking-[0.12em] text-slate-500">MASA</span><span id="prevMasa" class="font-bold"></span></div>
+                  <div class="px-3 py-1 text-center"><span class="block text-[5.5pt] font-extrabold tracking-[0.12em] text-slate-500">SASARAN</span><span id="prevSasaran" class="font-bold"></span></div>
+                  <div id="prevPelibatanBox" class="hidden px-3 py-1 text-center"><span class="block text-[5.5pt] font-extrabold tracking-[0.12em] text-slate-500">KERJASAMA</span><span id="prevPelibatan" class="font-bold"></span></div>
                 </div>
               </div>
 
               <!-- KAD OBJEKTIF -->
               <div class="border border-slate-300 rounded-lg p-2 bg-slate-50/50 page-break-avoid">
-                <p class="font-extrabold text-slate-900 text-[8pt] border-b border-slate-200 pb-0.5 uppercase">🎯 OBJEKTIF PROGRAM</p>
+                <p class="font-extrabold text-slate-900 text-[8pt] border-b border-slate-200 pb-0.5 uppercase">OBJEKTIF PROGRAM</p>
                 <p id="prevObjektif" class="whitespace-pre-wrap text-slate-800 mt-0.5 text-[8pt] leading-normal"></p>
               </div>
 
               <!-- KAD KEKUATAN -->
               <div class="border border-slate-300 rounded-lg p-2 bg-slate-50/50 page-break-avoid">
-                <p class="font-extrabold text-slate-900 text-[8pt] border-b border-slate-200 pb-0.5 uppercase">💪 KEKUATAN PROGRAM</p>
+                <p class="font-extrabold text-slate-900 text-[8pt] border-b border-slate-200 pb-0.5 uppercase">KEKUATAN PROGRAM</p>
                 <p id="prevKekuatan" class="whitespace-pre-wrap text-slate-800 mt-0.5 text-[8pt] leading-normal"></p>
               </div>
 
               <!-- KAD PENAMBAHBAIKAN -->
               <div class="border border-slate-300 rounded-lg p-2 bg-slate-50/50 page-break-avoid">
-                <p class="font-extrabold text-slate-900 text-[8pt] border-b border-slate-200 pb-0.5 uppercase">📈 PENAMBAHBAIKAN & CADANGAN</p>
+                <p class="font-extrabold text-slate-900 text-[8pt] border-b border-slate-200 pb-0.5 uppercase">PENAMBAHBAIKAN & CADANGAN</p>
                 <p id="prevPenambahbaikan" class="whitespace-pre-wrap text-slate-800 mt-0.5 text-[8pt] leading-normal"></p>
               </div>
 
@@ -444,17 +444,17 @@
                 
                 <div class="grid grid-cols-3 gap-2">
                   <div id="boxImg2" class="border border-slate-200 rounded p-1 text-center bg-slate-50 hidden">
-                    <img id="prevImg2" class="h-28 w-full object-cover object-top rounded">
+                    <img id="prevImg2" class="h-32 w-full object-cover object-top rounded">
                     <span id="prevCap2" class="text-[7pt] text-slate-600 italic block mt-0.5 font-medium truncate"></span>
                   </div>
 
                   <div id="boxImg3" class="border border-slate-200 rounded p-1 text-center bg-slate-50 hidden">
-                    <img id="prevImg3" class="h-28 w-full object-cover object-top rounded">
+                    <img id="prevImg3" class="h-32 w-full object-cover object-top rounded">
                     <span id="prevCap3" class="text-[7pt] text-slate-600 italic block mt-0.5 font-medium truncate"></span>
                   </div>
 
                   <div id="boxImg4" class="border border-slate-200 rounded p-1 text-center bg-slate-50 hidden">
-                    <img id="prevImg4" class="h-28 w-full object-cover object-top rounded">
+                    <img id="prevImg4" class="h-32 w-full object-cover object-top rounded">
                     <span id="prevCap4" class="text-[7pt] text-slate-600 italic block mt-0.5 font-medium truncate"></span>
                   </div>
                 </div>
@@ -463,11 +463,11 @@
               <!-- FOOTER PREVIEW -->
               <div class="pt-1.5 border-t border-slate-300 text-[7.5pt] text-slate-700 flex justify-between items-end page-break-avoid">
                 <div>
-                  <p><strong>Disediakan oleh:</strong> <span id="prevNama"></span> (<span id="prevJawatan"></span>)</p>
+                  <p><strong>Disediakan oleh:</strong> <span id="prevNama" class="font-bold"></span> (<span id="prevJawatan"></span>)</p>
                   <p><strong>Tarikh Laporan:</strong> <span id="prevTarikhLaporan"></span></p>
                 </div>
                 <div class="text-right text-[6.5pt] text-slate-400">
-                  OPR Web App PPDPU
+                  PPDPU | OPR System
                 </div>
               </div>
 
@@ -869,12 +869,18 @@
       ]
     };
 
+    function normaliseSuggestionText(value, fallback) {
+      const text = String(value || "").trim().replace(/\s+/g, " ");
+      return (text || fallback).toLocaleLowerCase("ms-MY");
+    }
+
     function pickSuggestions(fieldType, tajuk, sasaran) {
       const stock = suggestionStocks[fieldType] || [];
       const selected = [...stock].sort(() => Math.random() - 0.5).slice(0, 3);
-      const target = sasaran || "peserta";
+      const target = normaliseSuggestionText(sasaran, "peserta");
+      const program = normaliseSuggestionText(tajuk, "program ini");
       return selected.map((text, index) => {
-        const sentence = text.replaceAll("{tajuk}", tajuk || "program ini").replaceAll("{sasaran}", target);
+        const sentence = text.replaceAll("{tajuk}", program).replaceAll("{sasaran}", target);
         return fieldType === "objektif" ? `${index + 1}. ${sentence}` : `● ${sentence}`;
       }).join("\n");
     }
