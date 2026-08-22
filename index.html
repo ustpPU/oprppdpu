@@ -5,6 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>OPR PPDPU</title>
   <link rel="icon" type="image/png" href="https://i.ibb.co/fYY58Rh2/JATA-NEGARA-PNG.png">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="OPR Dashboard | PPD Petaling Utama">
+  <meta property="og:description" content="Sistem Laporan Ringkas Program / Aktiviti (One Page Report) PPD Petaling Utama.">
+  <meta property="og:url" content="https://ustppu.github.io/oprppdpu/">
+  <meta property="og:image" content="https://i.ibb.co/8nYrGf96/Gemini-Generated-Image-eyecq8eyecq8eyec.jpg">
+  <meta property="og:site_name" content="PPDPU | OPR System">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://i.ibb.co/8nYrGf96/Gemini-Generated-Image-eyecq8eyecq8eyec.jpg">
   
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -51,6 +59,12 @@
     .progress-step[data-status="done"] .step-label { color: #166534; font-weight: 700; }
     .progress-step[data-status="error"] .step-label { color: #991b1b; font-weight: 700; }
     .cropper-view-box, .cropper-face { border-radius: 0.5rem; }
+    .officer-job-title {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+    }
 
     /* TETAPAN CETAKAN A4 STRICT 1 PAGE */
     @page {
@@ -290,7 +304,7 @@
                   </button>
                 </div>
                 <div class="relative">
-                  <textarea id="objektif" oninput="updatePreview()" rows="3" required placeholder="1. ...&#10;2. ..." class="w-full bg-white border border-slate-300 rounded-xl p-2.5 pr-8 text-xs outline-none"></textarea>
+                  <textarea id="objektif" oninput="updatePreview()" onkeydown="handleStructuredEnter(event, 'objektif')" rows="3" required placeholder="1. ...&#10;2. ..." class="w-full bg-white border border-slate-300 rounded-xl p-2.5 pr-8 text-xs outline-none"></textarea>
                   <button type="button" onclick="clearField('objektif')" class="absolute top-2 right-2 text-slate-400 hover:text-slate-700 w-5 h-5 flex items-center justify-center">
                     <i class="fa-solid fa-xmark text-xs"></i>
                   </button>
@@ -305,7 +319,7 @@
                   </button>
                 </div>
                 <div class="relative">
-                  <textarea id="kekuatan" oninput="updatePreview()" rows="3" required placeholder="● ..." class="w-full bg-white border border-slate-300 rounded-xl p-2.5 pr-8 text-xs outline-none"></textarea>
+                  <textarea id="kekuatan" oninput="updatePreview()" onkeydown="handleStructuredEnter(event, 'bullet')" rows="3" required placeholder="● ..." class="w-full bg-white border border-slate-300 rounded-xl p-2.5 pr-8 text-xs outline-none"></textarea>
                   <button type="button" onclick="clearField('kekuatan')" class="absolute top-2 right-2 text-slate-400 hover:text-slate-700 w-5 h-5 flex items-center justify-center">
                     <i class="fa-solid fa-xmark text-xs"></i>
                   </button>
@@ -320,7 +334,7 @@
                   </button>
                 </div>
                 <div class="relative">
-                  <textarea id="penambahbaikan" oninput="updatePreview()" rows="3" required placeholder="● ..." class="w-full bg-white border border-slate-300 rounded-xl p-2.5 pr-8 text-xs outline-none"></textarea>
+                  <textarea id="penambahbaikan" oninput="updatePreview()" onkeydown="handleStructuredEnter(event, 'bullet')" rows="3" required placeholder="● ..." class="w-full bg-white border border-slate-300 rounded-xl p-2.5 pr-8 text-xs outline-none"></textarea>
                   <button type="button" onclick="clearField('penambahbaikan')" class="absolute top-2 right-2 text-slate-400 hover:text-slate-700 w-5 h-5 flex items-center justify-center">
                     <i class="fa-solid fa-xmark text-xs"></i>
                   </button>
@@ -336,7 +350,7 @@
               <div class="p-3 border border-slate-300 rounded-xl bg-slate-50 space-y-2">
                 <span class="text-xs font-bold text-slate-800 block">Gambar 1 (Hero Utama)</span>
                 <input type="file" id="fileImg1" accept="image/*" onchange="processAndUploadImage(event, 1)" class="text-xs text-slate-600">
-                <button type="button" id="editImgBtn1" onclick="openImageEditor(1)" class="hidden px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-[11px] font-bold text-slate-700 hover:bg-slate-100"><i class="fa-solid fa-crop-simple mr-1"></i>Reposition / Resize</button>
+                <button type="button" id="editImgBtn1" onclick="openImageEditor(1)" class="hidden px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-[11px] font-bold text-slate-700 hover:bg-slate-100"><i class="fa-solid fa-arrows-up-down-left-right mr-1"></i>Reposition</button>
               </div>
 
               <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
@@ -344,21 +358,21 @@
                   <span class="text-[11px] font-bold text-slate-700 block">Gambar 2</span>
                   <input type="file" id="fileImg2" accept="image/*" onchange="processAndUploadImage(event, 2)" class="text-[10px] text-slate-600 w-full">
                   <input type="text" id="kapsyen2" oninput="updatePreview()" placeholder="Kapsyen 2" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-[11px]">
-                  <button type="button" id="editImgBtn2" onclick="openImageEditor(2)" class="hidden px-2 py-1 bg-white border border-slate-300 rounded text-[10px] font-bold text-slate-700"><i class="fa-solid fa-crop-simple mr-1"></i>Susun</button>
+                  <button type="button" id="editImgBtn2" onclick="openImageEditor(2)" class="hidden px-2 py-1 bg-white border border-slate-300 rounded text-[10px] font-bold text-slate-700"><i class="fa-solid fa-arrows-up-down-left-right mr-1"></i>Reposition</button>
                 </div>
 
                 <div class="p-2.5 border border-slate-300 rounded-xl bg-slate-50 space-y-1.5">
                   <span class="text-[11px] font-bold text-slate-700 block">Gambar 3</span>
                   <input type="file" id="fileImg3" accept="image/*" onchange="processAndUploadImage(event, 3)" class="text-[10px] text-slate-600 w-full">
                   <input type="text" id="kapsyen3" oninput="updatePreview()" placeholder="Kapsyen 3" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-[11px]">
-                  <button type="button" id="editImgBtn3" onclick="openImageEditor(3)" class="hidden px-2 py-1 bg-white border border-slate-300 rounded text-[10px] font-bold text-slate-700"><i class="fa-solid fa-crop-simple mr-1"></i>Susun</button>
+                  <button type="button" id="editImgBtn3" onclick="openImageEditor(3)" class="hidden px-2 py-1 bg-white border border-slate-300 rounded text-[10px] font-bold text-slate-700"><i class="fa-solid fa-arrows-up-down-left-right mr-1"></i>Reposition</button>
                 </div>
 
                 <div class="p-2.5 border border-slate-300 rounded-xl bg-slate-50 space-y-1.5">
                   <span class="text-[11px] font-bold text-slate-700 block">Gambar 4</span>
                   <input type="file" id="fileImg4" accept="image/*" onchange="processAndUploadImage(event, 4)" class="text-[10px] text-slate-600 w-full">
                   <input type="text" id="kapsyen4" oninput="updatePreview()" placeholder="Kapsyen 4" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-[11px]">
-                  <button type="button" id="editImgBtn4" onclick="openImageEditor(4)" class="hidden px-2 py-1 bg-white border border-slate-300 rounded text-[10px] font-bold text-slate-700"><i class="fa-solid fa-crop-simple mr-1"></i>Susun</button>
+                  <button type="button" id="editImgBtn4" onclick="openImageEditor(4)" class="hidden px-2 py-1 bg-white border border-slate-300 rounded text-[10px] font-bold text-slate-700"><i class="fa-solid fa-arrows-up-down-left-right mr-1"></i>Reposition</button>
                 </div>
               </div>
             </div>
@@ -391,7 +405,7 @@
               
               <!-- HEADER TERKEMAS -->
               <div class="flex items-center space-x-2 pb-2 border-b border-slate-300 page-break-avoid">
-                <img src="https://i.ibb.co/ycG5rppn/logo.png" class="h-16 w-28 max-w-[112px] object-contain object-left shrink-0" alt="Logo PPD">
+                <img src="https://i.ibb.co/ycG5rppn/logo.png" class="h-[68px] w-[175px] max-w-none object-contain object-left shrink-0" alt="Logo PPD">
                 <div class="flex-1 text-center pr-1">
                   <h4 class="font-extrabold text-[10pt] uppercase tracking-wide text-slate-900 leading-tight">
                     LAPORAN RINGKAS PROGRAM / AKTIVITI (ONE PAGE REPORT)
@@ -402,8 +416,8 @@
               </div>
 
               <!-- HERO IMAGE -->
-              <div id="prevHeroBox" class="relative w-full h-52 bg-slate-900 rounded-lg overflow-hidden flex items-end page-break-avoid border border-slate-800">
-                <img id="prevImg1" class="absolute inset-0 w-full h-full object-cover object-[center_75%] hidden">
+              <div id="prevHeroBox" class="relative w-full aspect-video bg-slate-900 rounded-lg overflow-hidden flex items-end page-break-avoid border border-slate-800">
+                <img id="prevImg1" class="absolute inset-0 w-full h-full object-cover object-center hidden">
                 <div class="relative z-10 w-full bg-gradient-to-t from-slate-950 via-slate-950/70 to-transparent p-2.5 text-white">
                   <h2 id="prevTajuk" class="text-xs sm:text-sm font-extrabold uppercase tracking-wide leading-tight text-white"></h2>
                 </div>
@@ -412,10 +426,10 @@
               <!-- MAKLUMAT PROGRAM -->
               <div class="border border-slate-300 rounded-md bg-slate-50 page-break-avoid text-[7.5pt]">
                 <div class="flex flex-wrap items-stretch justify-center divide-x divide-slate-300 text-slate-800">
-                  <div class="px-3 py-1 text-center"><span class="block text-[5.5pt] font-extrabold tracking-[0.12em] text-slate-500">TARIKH</span><span id="prevTarikh" class="font-bold"></span></div>
-                  <div class="px-3 py-1 text-center"><span class="block text-[5.5pt] font-extrabold tracking-[0.12em] text-slate-500">MASA</span><span id="prevMasa" class="font-bold"></span></div>
-                  <div class="px-3 py-1 text-center"><span class="block text-[5.5pt] font-extrabold tracking-[0.12em] text-slate-500">SASARAN</span><span id="prevSasaran" class="font-bold"></span></div>
-                  <div id="prevPelibatanBox" class="hidden px-3 py-1 text-center"><span class="block text-[5.5pt] font-extrabold tracking-[0.12em] text-slate-500">KERJASAMA</span><span id="prevPelibatan" class="font-bold"></span></div>
+                  <div class="px-3 pt-1.5 pb-2 text-center leading-[1.35]"><span class="block text-[5.5pt] font-extrabold tracking-[0.12em] text-slate-500">TARIKH</span><span id="prevTarikh" class="block mt-0.5 font-bold leading-tight"></span></div>
+                  <div class="px-3 pt-1.5 pb-2 text-center leading-[1.35]"><span class="block text-[5.5pt] font-extrabold tracking-[0.12em] text-slate-500">MASA</span><span id="prevMasa" class="block mt-0.5 font-bold leading-tight"></span></div>
+                  <div class="px-3 pt-1.5 pb-2 text-center leading-[1.35]"><span class="block text-[5.5pt] font-extrabold tracking-[0.12em] text-slate-500">SASARAN</span><span id="prevSasaran" class="block mt-0.5 font-bold leading-tight"></span></div>
+                  <div id="prevPelibatanBox" class="hidden px-3 pt-1.5 pb-2 text-center leading-[1.35]"><span class="block text-[5.5pt] font-extrabold tracking-[0.12em] text-slate-500">KERJASAMA</span><span id="prevPelibatan" class="block mt-0.5 font-bold leading-tight"></span></div>
                 </div>
               </div>
 
@@ -443,17 +457,17 @@
                 
                 <div class="grid grid-cols-3 gap-2">
                   <div id="boxImg2" class="border border-slate-200 rounded p-1 text-center bg-slate-50 hidden">
-                    <img id="prevImg2" class="h-32 w-full object-cover object-top rounded">
+                    <img id="prevImg2" class="aspect-[4/3] w-full object-cover object-center rounded">
                     <span id="prevCap2" class="text-[7pt] text-slate-600 italic block mt-0.5 font-medium truncate"></span>
                   </div>
 
                   <div id="boxImg3" class="border border-slate-200 rounded p-1 text-center bg-slate-50 hidden">
-                    <img id="prevImg3" class="h-32 w-full object-cover object-top rounded">
+                    <img id="prevImg3" class="aspect-[4/3] w-full object-cover object-center rounded">
                     <span id="prevCap3" class="text-[7pt] text-slate-600 italic block mt-0.5 font-medium truncate"></span>
                   </div>
 
                   <div id="boxImg4" class="border border-slate-200 rounded p-1 text-center bg-slate-50 hidden">
-                    <img id="prevImg4" class="h-32 w-full object-cover object-top rounded">
+                    <img id="prevImg4" class="aspect-[4/3] w-full object-cover object-center rounded">
                     <span id="prevCap4" class="text-[7pt] text-slate-600 italic block mt-0.5 font-medium truncate"></span>
                   </div>
                 </div>
@@ -510,8 +524,8 @@
     <div class="bg-white rounded-2xl w-full max-w-3xl shadow-2xl overflow-hidden">
       <div class="flex items-center justify-between px-5 py-4 border-b border-slate-200">
         <div>
-          <h3 class="font-extrabold text-slate-900">Reposition / Resize Gambar</h3>
-          <p class="text-xs text-slate-500">Drag gambar, zoom dan pilih kawasan yang akan muncul dalam PDF.</p>
+          <h3 class="font-extrabold text-slate-900">Kedudukan Gambar</h3>
+          <p class="text-xs text-slate-500">Tarik gambar untuk menetapkan kedudukan yang akan muncul dalam pratonton dan PDF.</p>
         </div>
         <button type="button" onclick="closeImageEditor()" class="w-9 h-9 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200"><i class="fa-solid fa-xmark"></i></button>
       </div>
@@ -520,9 +534,7 @@
       </div>
       <div class="px-5 py-4 flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center gap-2">
-          <button type="button" onclick="cropZoom(-0.1)" class="px-3 py-2 rounded-lg border border-slate-300 text-xs font-bold"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
-          <button type="button" onclick="cropZoom(0.1)" class="px-3 py-2 rounded-lg border border-slate-300 text-xs font-bold"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
-          <button type="button" onclick="cropReset()" class="px-3 py-2 rounded-lg border border-slate-300 text-xs font-bold"><i class="fa-solid fa-rotate-left mr-1"></i>Reset</button>
+          <button type="button" onclick="cropReset()" class="px-3 py-2 rounded-lg border border-slate-300 text-xs font-bold"><i class="fa-solid fa-rotate-left mr-1"></i>Kembali Asal</button>
         </div>
         <div class="flex items-center gap-2">
           <button type="button" onclick="closeImageEditor()" class="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 text-xs font-bold">Batal</button>
@@ -831,6 +843,26 @@
       updatePreview();
     }
 
+    function handleStructuredEnter(event, type) {
+      if (event.key !== "Enter" || event.shiftKey || event.isComposing) return;
+      event.preventDefault();
+      const field = event.target;
+      const start = field.selectionStart;
+      const currentLine = field.value.slice(0, start).split("\n").pop();
+      let nextPrefix;
+
+      if (type === "objektif") {
+        const numbered = currentLine.match(/^(\s*)(\d+)\.\s*/);
+        nextPrefix = numbered ? `${numbered[1]}${Number(numbered[2]) + 1}. ` : "1. ";
+      } else {
+        const bulleted = currentLine.match(/^(\s*)[●•\-*]\s*/);
+        nextPrefix = bulleted ? `${bulleted[1]}● ` : "● ";
+      }
+
+      field.setRangeText(`\n${nextPrefix}`, start, field.selectionEnd, "end");
+      updatePreview();
+    }
+
     function resetOprForm() {
       if (confirm("Adakah anda pasti untuk mengosongkan borang?")) {
         document.getElementById("oprForm").reset();
@@ -1051,14 +1083,15 @@
 
       grid.innerHTML = state.pegawai.map(p => {
         const oprs = state.respon.filter(r => r.namaPegawai === p.nama);
+        const jawatanRingkas = String(p.jawatan || "").trim().toUpperCase() === "SCHOOL IMPROVEMENT SPECIALIST COACH" ? "SISC+" : p.jawatan;
         return `
-          <div onclick="openHistoryModal('${p.nama}')" class="p-5 bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow transition cursor-pointer flex items-start space-x-4">
+          <div onclick="openHistoryModal('${p.nama}')" class="p-5 min-h-[158px] bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow transition cursor-pointer flex items-start space-x-4">
             <div class="w-12 h-12 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-lg">
               ${p.nama.charAt(0)}
             </div>
             <div class="flex-1 min-w-0">
               <h4 class="font-bold text-slate-900 text-sm truncate">${p.nama}</h4>
-              <p class="text-xs text-slate-500 truncate">${p.jawatan}</p>
+              <p class="officer-job-title text-xs text-slate-500 leading-snug min-h-[2.5rem]">${jawatanRingkas || ""}</p>
               <div class="mt-3 flex items-center justify-between text-xs">
                 <span class="font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-lg">${oprs.length} OPR Dihantar</span>
                 <span class="text-slate-500 font-bold">Lihat <i class="fa-solid fa-chevron-right text-[10px]"></i></span>
@@ -1101,6 +1134,6 @@
       document.getElementById("historyModal").classList.add("hidden");
     }
   </script>
-  <script src="app-v15.js?v=17"></script>
+  <script src="app-v15.js?v=18"></script>
 </body>
 </html>
